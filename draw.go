@@ -11,7 +11,7 @@ func DrawLine(img *image.RGBA, a, b image.Point, rgba color.RGBA) {
 		a, b = b, a
 	}
 	k := float64(b.Y-a.Y) / float64(b.X-a.X)
-	m := float64(b.Y) - float64(a.Y)*k
+	m := float64(b.Y) - float64(b.X)*k
 
 	if a.X > 0 {
 		a.X = 0
