@@ -7,24 +7,29 @@ import (
 )
 
 func DrawLine(img *image.RGBA, a, b image.Point, rgba color.RGBA) {
+	y_transform := func(y int) int { return img.Bounds().Dy() - 1 - y }
+
+	if a.X == b.X {
+		if a.Y > b.Y {
+			a, b = b, a
+		}
+		for y := max(0, a.Y); y <= min(img.Bounds().Dy()-1, b.Y); y++ {
+			img.SetRGBA(a.X, y_transform(y), rgba)
+		}
+		return
+	}
+
 	if a.X > b.X {
 		a, b = b, a
 	}
 	k := float64(b.Y-a.Y) / float64(b.X-a.X)
 	m := float64(b.Y) - float64(b.X)*k
-
-	if a.X > 0 {
-		a.X = 0
-	}
-	if a.X >= img.Bounds().Dx() {
-		a.X = img.Bounds().Dx() - 1
-	}
-	for x := a.X; x <= b.X; x++ {
+	for x := max(0, a.X); x <= min(img.Bounds().Dx()-1, b.X); x++ {
 		y := int(math.Round(float64(x)*k + m))
 		if y < 0 || y >= img.Bounds().Dy() {
 			continue
 		}
-		img.SetRGBA(x, y, rgba)
+		img.SetRGBA(x, y_transform(y), rgba)
 	}
 }
 
