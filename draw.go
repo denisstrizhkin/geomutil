@@ -6,25 +6,29 @@ import (
 	"math"
 )
 
-func DrawLine(img *image.RGBA, a, b image.Point, rgba color.RGBA) {
+func DrawLine(img *image.RGBA, a, b Point, rgba color.RGBA) {
 	y_transform := func(y int) int { return img.Bounds().Dy() - 1 - y }
 
-	if a.X == b.X {
-		if a.Y > b.Y {
-			a, b = b, a
+	a_int := image.Point{int(math.Round(a.X)), int(math.Round(a.Y))}
+	b_int := image.Point{int(math.Round(b.X)), int(math.Round(b.Y))}
+
+	if a_int.X == b_int.X {
+		if a_int.Y > b_int.Y {
+			a_int, b_int = b_int, a_int
 		}
-		for y := max(0, a.Y); y <= min(img.Bounds().Dy()-1, b.Y); y++ {
-			img.SetRGBA(a.X, y_transform(y), rgba)
+		for y := max(0, a_int.Y); y <= min(img.Bounds().Dy()-1, b_int.Y); y++ {
+			img.SetRGBA(a_int.X, y_transform(y), rgba)
 		}
 		return
 	}
 
 	if a.X > b.X {
 		a, b = b, a
+		a_int, b_int = b_int, a_int
 	}
-	k := float64(b.Y-a.Y) / float64(b.X-a.X)
-	m := float64(b.Y) - float64(b.X)*k
-	for x := max(0, a.X); x <= min(img.Bounds().Dx()-1, b.X); x++ {
+	k := (b.Y - a.Y) / (b.X - a.X)
+	m := b.Y - b.X*k
+	for x := max(0, a_int.X); x <= min(img.Bounds().Dx()-1, b_int.X); x++ {
 		y := int(math.Round(float64(x)*k + m))
 		if y < 0 || y >= img.Bounds().Dy() {
 			continue
@@ -33,25 +37,30 @@ func DrawLine(img *image.RGBA, a, b image.Point, rgba color.RGBA) {
 	}
 }
 
-func DrawRect(img *image.RGBA, rect image.Rectangle, rgba color.RGBA) {
-	a := image.Point{rect.Min.X, rect.Min.Y}
-	b := image.Point{rect.Min.X, rect.Max.Y}
-	c := image.Point{rect.Max.X, rect.Max.Y}
-	d := image.Point{rect.Max.X, rect.Min.Y}
+func DrawRect(img *image.RGBA, pmin, pmax Point, rgba color.RGBA) {
+	a := Point{pmin.X, pmin.Y}
+	b := Point{pmin.X, pmax.Y}
+	c := Point{pmax.X, pmax.Y}
+	d := Point{pmax.X, pmin.Y}
 	DrawLine(img, a, b, rgba)
 	DrawLine(img, b, c, rgba)
 	DrawLine(img, c, d, rgba)
 	DrawLine(img, d, a, rgba)
 }
 
-func DrawSquare(img *image.RGBA, p image.Point, width int, rgba color.RGBA) {
+func DrawSquare(img *image.RGBA, p Point, width float64, rgba color.RGBA) {
 	if width <= 0 {
 		return
+	}
+	if width < 1 {
+		width = 1
+	} else {
+		width = math.Round(width)
 	}
 	width--
 	a := width / 2
 	b := width - a
-	min := image.Point{p.X - a, p.Y - a}
-	max := image.Point{p.X + b, p.Y + b}
-	DrawRect(img, image.Rectangle{min, max}, rgba)
+	min := Point{p.X - a, p.Y - a}
+	max := Point{p.X + b, p.Y + b}
+	DrawRect(img, min, max, rgba)
 }
