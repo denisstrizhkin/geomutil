@@ -42,12 +42,15 @@ func ReadPoints(path string) []Point {
 func SavePoints(points []Point, path string) {
 	f, err := os.Create(path)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalf("can't open: %s - %v", path, err)
 	}
 	defer f.Close()
 	w := bufio.NewWriter(f)
 	defer w.Flush()
 	for _, p := range points {
-		w.WriteString(fmt.Sprintf("%.4f %.4f\n", p.X, p.Y))
+		_, err := w.WriteString(fmt.Sprintf("%.4f %.4f\n", p.X, p.Y))
+		if err != nil {
+			log.Fatalf("can't write: %s - %v", path, err)
+		}
 	}
 }

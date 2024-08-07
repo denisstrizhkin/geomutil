@@ -8,7 +8,7 @@ type Triangle struct {
 	A, B, C Point
 }
 
-type Vertice struct {
+type Edge struct {
 	A, B Point
 }
 
@@ -86,7 +86,47 @@ func (cdt *CDT) Triangulate(points []Point) {
 	}
 }
 
-func (cdt *CDT) Vertices() []Vertice {
-	vertices := make([]Vertice, 0)
+func (cdt *CDT) Vertices() []Edge {
+	vertices := make([]Edge, 0)
 	return vertices
+}
+
+type DelaunayTriangulation struct {
+	triangles []Triangle
+}
+
+func NewDelaunayTriangulation() *DelaunayTriangulation {
+	return &DelaunayTriangulation{triangles: make([]Triangle, 0)}
+}
+
+func (dt *DelaunayTriangulation) Triangulate(points []Point) {
+	// find p0 in points (remove)
+	// calculate points p1 and p2
+	// p0,p1,p2 form initial triangle containing all points
+	for _, pr := range points {
+		// find triangle pi,pj,pk containing pr
+		if true { // if pr lies in the interior of pi,pj,pk
+			dt.legalizeEdge(pr, pi, pj)
+			dt.legalizeEdge(pr, pj, pk)
+			dt.legalizeEdge(pr, pk, pi)
+		} else { // if pr lies on an edge of pi,pj,pk
+			// TODO
+			// dt.legalizeEdge(pr, pk, pi)
+		}
+	}
+	// remove p1,p2 and their edges from triangulation
+}
+
+func (dt *DelaunayTriangulation) legalizeEdge(p, a, b Point) {
+	if true { // edge a,b is illegal
+		// a,b,c - triangle adjacent p,a,b
+		dt.legalizeEdge(p, a, c)
+		dt.legalizeEdge(p, c, b)
+	}
+}
+
+func (dt *DelaunayTriangulation) Edges() (edges []Edge) {
+	edges = make([]Edge, 0)
+	// get all edges of resulting triangulation
+	return edges
 }

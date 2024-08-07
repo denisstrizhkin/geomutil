@@ -1,27 +1,22 @@
 package main
 
 import (
-	"image"
-	"image/color"
-	"image/png"
-	"os"
-
-	"github.com/denisstrizhkin/geomutil"
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 func main() {
-	img := image.NewRGBA(
-		image.Rectangle{image.Point{0, 0}, image.Point{100, 100}},
-	)
-	magenta := color.RGBA{213, 63, 119, 255}
-	//mint := color.RGBA{162, 228, 184, 255}
+	// points := geomutil.ReadPoints("./a.txt")
+	rl.InitWindow(800, 450, "raylib [core] example - basic window")
+	defer rl.CloseWindow()
 
-	draw_at := func(p geomutil.Point) { geomutil.DrawSquare(img, p, 3, magenta) }
-	points := geomutil.ReadPoints("./a.txt")
-	for _, p := range points {
-		draw_at(p)
+	rl.SetTargetFPS(60)
+
+	for !rl.WindowShouldClose() {
+		rl.BeginDrawing()
+
+		rl.ClearBackground(rl.RayWhite)
+		rl.DrawText("Congrats! You created your first window!", 190, 200, 20, rl.LightGray)
+
+		rl.EndDrawing()
 	}
-
-	f, _ := os.Create("test.png")
-	png.Encode(f, img)
 }
