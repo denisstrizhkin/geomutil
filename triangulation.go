@@ -99,12 +99,31 @@ func NewDelaunayTriangulation() *DelaunayTriangulation {
 	return &DelaunayTriangulation{triangles: make([]Triangle, 0)}
 }
 
+func (dt *DelaunayTriangulation) FindHighestPoint(points []Point) {
+	p0 = points[0]
+	for _, p := range points {
+		if p.Y > p0.Y {
+			p0 = p
+		} else if (p.Y == p0.Y) && (p.X < p0.X){
+			p0 = p
+		}
+	}
+	return p0
+}
+
+
 func (dt *DelaunayTriangulation) Triangulate(points []Point) {
 	// find p0 in points (remove)
-	// calculate points p1 and p2
-	// p0,p1,p2 form initial triangle containing all points
+	// calculate points p(-1) and p(-2)
+	// p0,p(-1),p(-2) form initial triangle containing all points
+	p0 = FindHighestPoint(points)
+	var p_bot, p_top Point
 	for _, pr := range points {
 		// find triangle pi,pj,pk containing pr
+		if pr == p0 {
+			continue
+		}
+		
 		if true { // if pr lies in the interior of pi,pj,pk
 			dt.legalizeEdge(pr, pi, pj)
 			dt.legalizeEdge(pr, pj, pk)
