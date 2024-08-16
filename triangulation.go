@@ -99,7 +99,7 @@ func NewDelaunayTriangulation() *DelaunayTriangulation {
 	return &DelaunayTriangulation{triangles: make([]Triangle, 0)}
 }
 
-func FindHighestPoint(points []Point) Point {
+func (dt *DelaunayTriangulation) FindHighestPoint(points []Point) Point {
 	p0 := points[0]
 	for _, p := range points {
 		if p.Y > p0.Y {
