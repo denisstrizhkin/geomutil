@@ -7,10 +7,39 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sort"
 )
 
 type Point struct {
 	X, Y float64
+}
+
+type ByPointX []Point
+
+func (p ByPointX) Len() int {
+	return len(p)
+}
+
+func (p ByPointX) Less(i, j int) bool {
+	return p[i].X < p[j].X
+}
+
+func (p ByPointX) Swap(i, j int) {
+	p[i], p[j] = p[j], p[i]
+}
+
+type ByPointY []Point
+
+func (p ByPointY) Len() int {
+	return len(p)
+}
+
+func (p ByPointY) Less(i, j int) bool {
+	return p[i].Y < p[j].Y
+}
+
+func (p ByPointY) Swap(i, j int) {
+	p[i], p[j] = p[j], p[i]
 }
 
 func ParseFloat(s string) float64 {
