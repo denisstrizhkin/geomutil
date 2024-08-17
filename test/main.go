@@ -10,7 +10,8 @@ func main() {
 	PATH := "./input.txt"
 	// fmt.Println(geomutil.ReadPoints(PATH))
 	gh := geomutil.NewConvexHull(geomutil.ReadPoints(PATH))
-	fmt.Println(gh)
+	fmt.Println(gh.Points)
+	geomutil.SavePoints(gh.Points, "conv_out.txt")
 	// geomutil.SavePoints(hull, "points.txt")
 	// rl.InitWindow(800, 450, "My convex hull")
 	// defer rl.CloseWindow()

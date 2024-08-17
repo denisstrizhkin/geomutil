@@ -2,10 +2,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 points = np.loadtxt("input.txt")
-print(points)
-point_x = points[:, 0]
-point_y = points[:, 1]
-plt.plot(point_x, point_y, '.')
+convex = np.loadtxt("conv_out.txt")
+plt.plot(points[:, 0], points[:, 1], '.')
+plt.plot(convex[:, 0], convex[:, 1])
 plt.show()
 
 
