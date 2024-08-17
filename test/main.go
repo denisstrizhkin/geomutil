@@ -2,13 +2,15 @@ package main
 
 import (
 	// rl "github.com/gen2brain/raylib-go/raylib"
+	"fmt"
 	geomutil "github.com/denisstrizhkin/geomutil"
 )
 
 func main() {
-	points := geomutil.ReadPoints("./a.txt")
-	hull := geomutil.NewConvexHull(points)
-	println(hull)
+	PATH := "./input.txt"
+	// fmt.Println(geomutil.ReadPoints(PATH))
+	gh := geomutil.NewConvexHull(geomutil.ReadPoints(PATH))
+	fmt.Println(gh)
 	// geomutil.SavePoints(hull, "points.txt")
 	// rl.InitWindow(800, 450, "My convex hull")
 	// defer rl.CloseWindow()
