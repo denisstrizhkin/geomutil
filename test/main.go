@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	PATH := "./a.txt"
+	PATH := "./input.txt"
 	// fmt.Println(geomutil.ReadPoints(PATH))
 	gh := geomutil.NewConvexHull(geomutil.ReadPoints(PATH))
 	fmt.Println(gh.Points)
