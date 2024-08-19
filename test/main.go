@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
 	geomutil "github.com/denisstrizhkin/geomutil"
 	rl "github.com/gen2brain/raylib-go/raylib"
+	"math"
 )
 
 const (
@@ -14,7 +14,7 @@ const (
 )
 
 func pointToVector2(p geomutil.Point) rl.Vector2 {
-	return rl.NewVector2(float32(p.X), float32(p.Y))
+	return rl.NewVector2(float32(p.X), -float32(p.Y))
 }
 
 func pointAvg(points []geomutil.Point) geomutil.Point {
@@ -23,6 +23,28 @@ func pointAvg(points []geomutil.Point) geomutil.Point {
 		avg = avg.Add(p)
 	}
 	return avg.Scale(float64(1) / float64(len(points)))
+}
+
+func getDefaultZoom(points []geomutil.Point) float32 {
+	xMax := -math.MaxFloat64
+	yMax := -math.MaxFloat64
+	center := pointAvg(points)
+	for _, p := range points {
+		x := math.Abs(p.X - center.X)
+		y := math.Abs(p.Y - center.Y)
+		if x > xMax {
+			xMax = x
+		}
+		if y > yMax {
+			yMax = y
+		}
+	}
+	zoomX := float32(float64(WINDOW_WIDTH)/2/xMax) * 0.95
+	zoomY := float32(float64(WINDOW_HEIGHT)/2/yMax) * 0.95
+	if zoomX < zoomY {
+		return zoomX
+	}
+	return zoomY
 }
 
 func updateCamera(c *rl.Camera2D) {
@@ -50,12 +72,14 @@ func plotPolygon(points []geomutil.Point, width float32, color rl.Color) {
 
 func main() {
 	PATH := "./input.txt"
-	gh := geomutil.NewConvexHull(geomutil.ReadPoints(PATH))
-	fmt.Println(gh.Points)
+	points := geomutil.ReadPoints(PATH)
+	gh := geomutil.NewConvexHull(points)
 
-	pointsCenter := pointToVector2(pointAvg(gh.Points))
-	camera := rl.NewCamera2D(rl.NewVector2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2), pointsCenter, 0, 1)
-	camera.Target = pointsCenter
+	pointsCenter := pointAvg(gh.Points)
+	cameraTarget := pointToVector2(pointsCenter)
+	cameraOffset := rl.NewVector2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2)
+	cameraZoom := getDefaultZoom(points)
+	camera := rl.NewCamera2D(cameraOffset, cameraTarget, 0, cameraZoom)
 
 	rl.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "geomutil test")
 	defer rl.CloseWindow()
@@ -66,6 +90,7 @@ func main() {
 		updateCamera(&camera)
 
 		rl.ClearBackground(rl.RayWhite)
+		plotPoints(points, 2, rl.Yellow)
 		plotPoints(gh.Points, 2, rl.Red)
 		plotPolygon(gh.Points, 2, rl.Green)
 
