@@ -9,14 +9,6 @@ type ConvexHull struct {
 	Points []Point
 }
 
-func (p Point) Subtract(q Point) Point {
-	return Point{p.X - q.X, p.Y - q.Y}
-}
-
-func (p Point) VectMult(q Point) float64 {
-	return p.X*q.Y - p.Y*q.X
-}
-
 func NewConvexHull(points []Point) *ConvexHull {
 	sort.Sort(ByPointX(points))
 	fmt.Println(points)

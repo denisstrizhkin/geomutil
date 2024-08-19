@@ -13,6 +13,22 @@ type Point struct {
 	X, Y float64
 }
 
+func (p Point) Scale(a float64) Point {
+	return Point{p.X * a, p.Y * a}
+}
+
+func (p Point) Add(q Point) Point {
+	return Point{p.X + q.X, p.Y + q.Y}
+}
+
+func (p Point) Subtract(q Point) Point {
+	return Point{p.X - q.X, p.Y - q.Y}
+}
+
+func (p Point) VectMult(q Point) float64 {
+	return p.X*q.Y - p.Y*q.X
+}
+
 type ByPointX []Point
 
 func (p ByPointX) Len() int {
