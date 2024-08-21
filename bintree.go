@@ -60,3 +60,33 @@ func (bt *BinTree[T]) search(node *Node[T], val T) (any, error) {
 func (bt *BinTree[T]) Search(val T) (any, error) {
 	return bt.search(bt.head, val)
 }
+
+func (bt *BinTree[T]) delete(node *Node[T], val T) (any, error) {
+	if node == nil {
+		return nil, ErrItemNotFound
+	}
+	if bt.comp(val, node.Value) > 0 {
+		return bt.delete(node.Right, val)
+	} else if bt.comp(val, node.Value) < 0 {
+		return bt.delete(bt.head.Left, val)
+	}
+	if node.Left == nil {
+		return node.Right, nil
+	} else if node.Right == nil {
+		return node.Right, nil
+	}
+	new_n := bt.minNodeSearch(node.Right)
+	bt.delete(node.Right, new_n.Value)
+	return new_n, nil
+}
+
+func (bt *BinTree[T]) DeleteNode(val T) (any, error) {
+	return bt.delete(bt.head, val)
+}
+
+func (bt *BinTree[T]) minNodeSearch(node *Node[T]) *Node[T] {
+	if node.Left == nil {
+		return node
+	}
+	return bt.minNodeSearch(node.Left)
+}
