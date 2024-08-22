@@ -17,15 +17,15 @@ func newNode[T any](val T) *Node[T] {
 	return &Node[T]{Value: val}
 }
 
-func (n *Node[T]) InsertLeftNode(val T) *Node[T] {
-	n.Left = newNode(val)
-	return n.Left
-}
+// func (n *Node[T]) insertLeftNode(val T) *Node[T] {
+// 	n.Left = newNode(val)
+// 	return n.Left
+// }
 
-func (n *Node[T]) InsertRightNode(val T) *Node[T] {
-	n.Right = newNode(val)
-	return n.Right
-}
+// func (n *Node[T]) insertRightNode(val T) *Node[T] {
+// 	n.Right = newNode(val)
+// 	return n.Right
+// }
 
 func (n *Node[T]) IsLeafNode() bool {
 	return n.Left == nil && n.Right == nil
@@ -42,6 +42,23 @@ type Comparator[T any] func(a, b T) int
 
 func NewBinTree[T any](comp Comparator[T]) *BinTree[T] {
 	return &BinTree[T]{comp: comp}
+}
+
+func (bt *BinTree[T]) insertNode(node *Node[T], val T) *Node[T] {
+	if node == nil {
+		return newNode(val)
+	}
+	if bt.comp(val, node.Value) < 0 {
+		return bt.insertNode(node.Left, val)
+	}
+	if bt.comp(val, node.Value) > 0 {
+		return bt.insertNode(node.Right, val)
+	}
+	return node
+}
+
+func (bt *BinTree[T]) InsertNode(val T) {
+	bt.head = bt.insertNode(bt.head, val)
 }
 
 func (bt *BinTree[T]) search(node *Node[T], val T) (any, error) {
