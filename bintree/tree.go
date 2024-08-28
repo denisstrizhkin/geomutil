@@ -1,4 +1,4 @@
-package geomutil
+package bintree
 
 import (
 	"fmt"
@@ -106,19 +106,31 @@ func (bt *BinTree[Key, Value]) delete(node *Node[Key, Value], key Key) (*Node[Ke
 		return bt.delete(node.Left, key)
 	case cmp > 0:
 		return bt.delete(node.Right, key)
+	default:
+		bt.deleteAt(node)
+		return node, true
+	}
+}
+
+func (bt *BinTree[Key, Value]) deleteAt(node *Node[Key, Value]) {
+	bt.deleted = node.Value
+	switch {
+		case node.Left == nil:
+			return node.Right, true
+		case node.Right == nil:
+			return node.Left, true
+		default:
+			nodeMin := 
+	}
 	case node.Left == nil:
-		bt.deleted = node.Value
 		return node.Right, true
 	case node.Right == nil:
 		bt.deleted = node.Value
 		return node.Left, true
-	default:
-		// this is broken for now
-		return node, true
-	}
 	// new_n := bt.minNodeSearch(node.Right)
 	// bt.delete(node.Right, new_n.Value)
 	// return new_n, nil
+	
 }
 
 func (bt *BinTree[Key, Value]) minNodeSearch(node *Node[Key, Value]) *Node[Key, Value] {

@@ -1,8 +1,7 @@
-package main
+package bintree
 
 import (
 	"fmt"
-	geomutil "github.com/denisstrizhkin/geomutil"
 )
 
 func main() {
