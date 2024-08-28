@@ -1,23 +1,24 @@
 package geomutil
 
 import (
-	"errors"
 	"fmt"
 )
 
-type BinTree[T any] struct {
-	head *Node[T]
-	comp Comparator[T]
+type BinTree[Key, Value any] struct {
+	head    *Node[Key, Value]
+	comp    Comparator[Key]
+	deleted Value
 }
 
-type Node[T any] struct {
-	Value T
-	Left  *Node[T]
-	Right *Node[T]
+type Node[Key, Value any] struct {
+	Key   Key
+	Value Value
+	Left  *Node[Key, Value]
+	Right *Node[Key, Value]
 }
 
-func newNode[T any](val T) *Node[T] {
-	return &Node[T]{Value: val}
+func NewNode[Key, Value any](key Key, val Value) *Node[Key, Value] {
+	return &Node[Key, Value]{Key: key, Value: val}
 }
 
 // func (n *Node[T]) insertLeftNode(val T) *Node[T] {
@@ -30,84 +31,97 @@ func newNode[T any](val T) *Node[T] {
 // 	return n.Right
 // }
 
-func (n *Node[T]) IsLeafNode() bool {
+func (n *Node[Key, Value]) IsLeafNode() bool {
 	return n.Left == nil && n.Right == nil
 }
 
-func (n *Node[T]) IsFullNode() bool {
+func (n *Node[Key, Value]) IsFullNode() bool {
 	return n.Left != nil && n.Right != nil
 }
 
-var ErrEmptyBinTree = errors.New("bin tree is empty")
-var ErrItemNotFound = errors.New("no such item in your bin tree")
+type Comparator[Key any] func(a, b Key) int
 
-type Comparator[T any] func(a, b T) int
-
-func NewBinTree[T any](comp Comparator[T]) *BinTree[T] {
-	return &BinTree[T]{comp: comp}
+func NewBinTree[Key, Value any](comp Comparator[Key]) *BinTree[Key, Value] {
+	return &BinTree[Key, Value]{comp: comp}
 }
 
-func (bt *BinTree[T]) insertNode(node *Node[T], val T) *Node[T] {
+func (bt *BinTree[Key, Value]) InsertNode(key Key, val Value) {
+	bt.head = bt.insertNode(bt.head, key, val)
+}
+
+func (bt *BinTree[Key, Value]) insertNode(
+	node *Node[Key, Value], key Key, val Value,
+) *Node[Key, Value] {
 	if node == nil {
 		fmt.Println("Inserted value!")
-		return newNode(val)
+		return NewNode(key, val)
 	}
-	if bt.comp(val, node.Value) < 0 {
-		fmt.Println("Went left...")
-		return bt.insertNode(node.Left, val)
+	cmp := bt.comp(node.Key, key)
+	switch {
+	case cmp < 0:
+		return bt.insertNode(node.Left, key, val)
+	case cmp > 0:
+		return bt.insertNode(node.Right, key, val)
+	default:
+		node.Value = val
+		return node
 	}
-	if bt.comp(val, node.Value) > 0 {
-		fmt.Println("Went right...")
-		return bt.insertNode(node.Right, val)
-	}
-	return node
 }
 
-func (bt *BinTree[T]) InsertNode(val T) {
-	bt.head = bt.insertNode(bt.head, val)
+func (bt *BinTree[Key, Value]) Search(key Key) (Value, bool) {
+	return bt.search(bt.head, key)
 }
 
-func (bt *BinTree[T]) search(node *Node[T], val T) (any, error) {
+func (bt *BinTree[Key, Value]) search(node *Node[Key, Value], key Key) (Value, bool) {
 	if node == nil {
-		return nil, ErrItemNotFound
+		var zero Value
+		return zero, false
 	}
-	if bt.comp(val, node.Value) == 0 {
-		return val, nil
+	cmp := bt.comp(node.Key, key)
+	switch {
+	case cmp < 0:
+		return bt.search(node.Left, key)
+	case cmp > 0:
+		return bt.search(node.Right, key)
+	default:
+		return node.Value, true
 	}
-	if bt.comp(val, node.Value) < 0 {
-		return bt.search(node.Left, val)
-	}
-	return bt.search(node.Right, val)
 }
 
-func (bt *BinTree[T]) Search(val T) (any, error) {
-	return bt.search(bt.head, val)
+func (bt *BinTree[Key, Value]) DeleteNode(key Key) (Value, bool) {
+	var zero Value
+	var ok bool
+	bt.deleted = zero
+	bt.head, ok = bt.delete(bt.head, key)
+	return bt.deleted, ok
 }
 
-func (bt *BinTree[T]) delete(node *Node[T], val T) (any, error) {
+func (bt *BinTree[Key, Value]) delete(node *Node[Key, Value], key Key) (*Node[Key, Value], bool) {
 	if node == nil {
-		return nil, ErrItemNotFound
+		return nil, false
 	}
-	if bt.comp(val, node.Value) > 0 {
-		return bt.delete(node.Right, val)
-	} else if bt.comp(val, node.Value) < 0 {
-		return bt.delete(bt.head.Left, val)
+	cmp := bt.comp(node.Key, key)
+	switch {
+	case cmp < 0:
+		return bt.delete(node.Left, key)
+	case cmp > 0:
+		return bt.delete(node.Right, key)
+	case node.Left == nil:
+		bt.deleted = node.Value
+		return node.Right, true
+	case node.Right == nil:
+		bt.deleted = node.Value
+		return node.Left, true
+	default:
+		// this is broken for now
+		return node, true
 	}
-	if node.Left == nil {
-		return node.Right, nil
-	} else if node.Right == nil {
-		return node.Right, nil
-	}
-	new_n := bt.minNodeSearch(node.Right)
-	bt.delete(node.Right, new_n.Value)
-	return new_n, nil
+	// new_n := bt.minNodeSearch(node.Right)
+	// bt.delete(node.Right, new_n.Value)
+	// return new_n, nil
 }
 
-func (bt *BinTree[T]) DeleteNode(val T) (any, error) {
-	return bt.delete(bt.head, val)
-}
-
-func (bt *BinTree[T]) minNodeSearch(node *Node[T]) *Node[T] {
+func (bt *BinTree[Key, Value]) minNodeSearch(node *Node[Key, Value]) *Node[Key, Value] {
 	if node.Left == nil {
 		return node
 	}
