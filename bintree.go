@@ -1,6 +1,9 @@
 package geomutil
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 type BinTree[T any] struct {
 	head *Node[T]
@@ -46,12 +49,15 @@ func NewBinTree[T any](comp Comparator[T]) *BinTree[T] {
 
 func (bt *BinTree[T]) insertNode(node *Node[T], val T) *Node[T] {
 	if node == nil {
+		fmt.Println("Inserted value!")
 		return newNode(val)
 	}
 	if bt.comp(val, node.Value) < 0 {
+		fmt.Println("Went left...")
 		return bt.insertNode(node.Left, val)
 	}
 	if bt.comp(val, node.Value) > 0 {
+		fmt.Println("Went right...")
 		return bt.insertNode(node.Right, val)
 	}
 	return node

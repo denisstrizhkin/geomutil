@@ -33,6 +33,8 @@ func TestIsLeafNode() {
 	tree.InsertNode(4)
 	tree.InsertNode(5)
 
+	fmt.Println(tree.Search(1))
+
 	val, err := tree.Search(3)
 	val1, err1 := tree.Search(10)
 	fmt.Println(val, err)
