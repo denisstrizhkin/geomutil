@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	ZOOM_SPEED    = 10
+	ZOOM_SPEED    = 20
 	MOUSE_SENS    = 100
 	WINDOW_WIDTH  = 800
 	WINDOW_HEIGHT = 450
@@ -64,10 +64,15 @@ func plotPoints(points []geomutil.Point, radius float32, color rl.Color) {
 }
 
 func plotPolygon(points []geomutil.Point, width float32, color rl.Color) {
+	prevWidth := rl.GetLineWidth()
+	rl.DrawRenderBatchActive()
+	rl.SetLineWidth(width)
 	for i := 1; i < len(points); i++ {
 		rl.DrawLineV(pointToVector2(points[i-1]), pointToVector2(points[i]), color)
 	}
 	rl.DrawLineV(pointToVector2(points[0]), pointToVector2(points[len(points)-1]), color)
+	rl.DrawRenderBatchActive()
+	rl.SetLineWidth(prevWidth)
 }
 
 func main() {
@@ -92,7 +97,7 @@ func main() {
 		rl.ClearBackground(rl.RayWhite)
 		plotPoints(points, 2, rl.Yellow)
 		plotPoints(gh.Points, 2, rl.Red)
-		plotPolygon(gh.Points, 2, rl.Green)
+		plotPolygon(gh.Points, 4, rl.Green)
 
 		rl.EndDrawing()
 	}
