@@ -1,5 +1,7 @@
 package bintree
 
+import "fmt"
+
 type BinTree[Key, Value any] struct {
 	head  *Node[Key, Value]
 	cmp   Comparator[Key]
@@ -27,6 +29,10 @@ func NewNode[Key, Value any](key Key, val Value) *Node[Key, Value] {
 // 	return n.Right
 // }
 
+func (n *Node[Key, Value]) String() string {
+	return fmt.Sprintf("(%v %v)", n.Key, n.Value)
+}
+
 func (n *Node[Key, Value]) IsLeaf() bool {
 	return n.Left == nil && n.Right == nil
 }
@@ -46,6 +52,10 @@ type Comparator[Key any] func(a, b Key) int
 
 func NewBinTree[Key, Value any](comp Comparator[Key]) *BinTree[Key, Value] {
 	return &BinTree[Key, Value]{cmp: comp}
+}
+
+func (bt *BinTree[Key, Value]) String() string {
+	return ""
 }
 
 func (bt *BinTree[Key, Value]) Size() int {
