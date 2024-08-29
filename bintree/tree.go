@@ -1,6 +1,8 @@
 package bintree
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type BinTree[Key, Value any] struct {
 	head  *Node[Key, Value]
@@ -31,6 +33,10 @@ func NewNode[Key, Value any](key Key, val Value) *Node[Key, Value] {
 
 func (n *Node[Key, Value]) String() string {
 	return fmt.Sprintf("(%v %v)", n.Key, n.Value)
+}
+
+func (bt *BinTree[Key, Value]) String() string {
+
 }
 
 func (n *Node[Key, Value]) IsLeaf() bool {
@@ -137,4 +143,34 @@ func (bt *BinTree[Key, Value]) deleteAt(node *Node[Key, Value]) *Node[Key, Value
 		bt.deleteAt(nodeMin)
 		return node
 	}
+}
+
+func absInt(a int) int {
+	if a < 0 {
+		return -a
+	}
+	return a
+}
+
+func (bt *BinTree[Key, Value]) isBalTree(node *Node[Key, Value]) int {
+	if node == nil {
+		return 0
+	}
+	lh := bt.isBalTree(node.Left)
+	if lh == -1 {
+		return -1
+	}
+	rh := bt.isBalTree(node.Right)
+	if rh == -1 {
+		return -1
+	}
+
+	if absInt(lh-rh) > 1 {
+		return -1
+	}
+	return max(lh, rh) + 1
+}
+
+func (bt *BinTree[Key, Value]) IsBalanced() bool {
+	return bt.isBalTree(bt.head) > 0
 }

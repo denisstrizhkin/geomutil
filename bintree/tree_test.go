@@ -9,7 +9,7 @@ func cmpInt(a, b int) int {
 	return a - b
 }
 
-var exampleTree BinTree[int, string] = BinTree[int, string]{
+var ExTree BinTree[int, string] = BinTree[int, string]{
 	count: 4,
 	cmp:   cmpInt,
 	head: &Node[int, string]{
@@ -56,7 +56,21 @@ func TestInsert(t *testing.T) {
 	if bt.Size() != 4 {
 		t.Errorf("wanted %d, got %d", 0, bt.Size())
 	}
+	bt.Put(5, "Den4ik")
+	if bt.Size() != 5 {
+		t.Errorf("wanted %d, got %d", 0, bt.Size())
+	}
 	if reflect.DeepEqual(bt, exampleTree) {
 		t.Errorf("didn't match the example one")
+	}
+	if !bt.IsBalanced() {
+		t.Errorf("Your tree is not balanced!")
+	}
+}
+
+func TestNodeString(t *testing.T) {
+	n := NewNode(1, "Rika")
+	if n.String() != "(1 Rika)" {
+		t.Errorf("wanted %s, got %s", "(1 Rika)", n.String())
 	}
 }
