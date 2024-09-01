@@ -32,11 +32,19 @@ func NewNode[Key, Value any](key Key, val Value) *Node[Key, Value] {
 // }
 
 func (n *Node[Key, Value]) String() string {
-	return fmt.Sprintf("(%v %v)", n.Key, n.Value)
+	return fmt.Sprintf("(%v %v) ", n.Key, n.Value)
+}
+
+func (bt *BinTree[Key, Value]) strPreOrder(n *Node[Key, Value]) string {
+	if n == nil {
+		return ""
+	}
+	fmt.Println(n.String())
+	return n.String() + bt.strPreOrder(n.Left) + bt.strPreOrder(n.Right)
 }
 
 func (bt *BinTree[Key, Value]) String() string {
-
+	return fmt.Sprintf("[ %s]", bt.strPreOrder(bt.head))
 }
 
 func (n *Node[Key, Value]) IsLeaf() bool {
@@ -58,10 +66,6 @@ type Comparator[Key any] func(a, b Key) int
 
 func NewBinTree[Key, Value any](comp Comparator[Key]) *BinTree[Key, Value] {
 	return &BinTree[Key, Value]{cmp: comp}
-}
-
-func (bt *BinTree[Key, Value]) String() string {
-	return ""
 }
 
 func (bt *BinTree[Key, Value]) Size() int {
