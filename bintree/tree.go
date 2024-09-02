@@ -105,9 +105,9 @@ func (bt *BinTree[Key, Value]) get(node *Node[Key, Value], key Key) (Value, bool
 	}
 	cmp := bt.cmp(node.Key, key)
 	switch {
-	case cmp < 0:
-		return bt.get(node.Left, key)
 	case cmp > 0:
+		return bt.get(node.Left, key)
+	case cmp < 0:
 		return bt.get(node.Right, key)
 	default:
 		return node.Value, true
@@ -161,9 +161,9 @@ func (bt *BinTree[Key, Value]) delete(node *Node[Key, Value], key Key) *Node[Key
 	}
 	cmp := bt.cmp(node.Key, key)
 	switch {
-	case cmp < 0:
-		return bt.delete(node.Left, key)
 	case cmp > 0:
+		return bt.delete(node.Left, key)
+	case cmp < 0:
 		return bt.delete(node.Right, key)
 	default:
 		bt.count--
