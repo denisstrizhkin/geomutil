@@ -96,24 +96,24 @@ func TestGet(t *testing.T) {
 	}
 }
 
-// func TestNodeString(t *testing.T) {
-// 	n := NewNode(1, "Rika")
-// 	if n.String() != "(1 Rika) " {
-// 		t.Errorf("wanted %s, got %s", "(1 Rika)", n.String())
-// 	}
-// }
+func TestNodeString(t *testing.T) {
+	n := NewNode(1, "Rika")
+	if n.String() != "(1 Rika)" {
+		t.Errorf("wanted %s, got %s", "(1 Rika)", n.String())
+	}
+}
 
-// func TestBinTreeString(t *testing.T) {
-// 	bt := NewBinTree[int, int](cmpInt)
-// 	bt.Put(3, 3)
-// 	bt.Put(2, 2)
-// 	bt.Put(4, 4)
-// 	bt.Put(1, 1)
-// 	if !bt.IsBalanced() {
-// 		t.Errorf("Your tree is not balanced!")
-// 	}
-// 	wanted := "[ (3 3) (2 2) (1 1) (4 4) ]"
-// 	if bt.String() != wanted {
-// 		t.Errorf("wanted %s, got %v", wanted, bt)
-// 	}
-// }
+func TestBinTreeString(t *testing.T) {
+	bt := NewBinTree[int, int](cmpInt)
+	bt.Put(3, 3)
+	bt.Put(2, 2)
+	bt.Put(4, 4)
+	bt.Put(1, 1)
+	if !bt.IsBalanced() {
+		t.Errorf("Your tree is not balanced!")
+	}
+	wanted := "[ (3 3) (2 2) (1 1) (4 4) ]"
+	if bt.String() != wanted {
+		t.Errorf("wanted %s, got %v", wanted, bt)
+	}
+}
