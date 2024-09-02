@@ -2,13 +2,8 @@ package bintree
 
 import (
 	"fmt"
+	"strings"
 )
-
-type BinTree[Key, Value any] struct {
-	head  *Node[Key, Value]
-	cmp   Comparator[Key]
-	count int
-}
 
 type Node[Key, Value any] struct {
 	Key   Key
@@ -32,19 +27,29 @@ func NewNode[Key, Value any](key Key, val Value) *Node[Key, Value] {
 // }
 
 func (n *Node[Key, Value]) String() string {
-	return fmt.Sprintf("(%v %v) ", n.Key, n.Value)
+	return fmt.Sprintf("(%v %v)", n.Key, n.Value)
 }
 
-func (bt *BinTree[Key, Value]) strPreOrder(n *Node[Key, Value]) string {
-	if n == nil {
-		return ""
-	}
-	fmt.Println(n.String())
-	return n.String() + bt.strPreOrder(n.Left) + bt.strPreOrder(n.Right)
+type Comparator[Key any] func(a, b Key) int
+type BinTree[Key, Value any] struct {
+	head  *Node[Key, Value]
+	cmp   Comparator[Key]
+	count int
+}
+
+func NewBinTree[Key, Value any](comp Comparator[Key]) *BinTree[Key, Value] {
+	return &BinTree[Key, Value]{cmp: comp}
 }
 
 func (bt *BinTree[Key, Value]) String() string {
-	return fmt.Sprintf("[ %s]", bt.strPreOrder(bt.head))
+	var sb strings.Builder
+	sb.WriteString("[ ")
+	bt.PreOrderTraversalNode(func(node *Node[Key, Value]) {
+		sb.WriteString(node.String())
+		sb.WriteRune(' ')
+	})
+	sb.WriteRune(']')
+	return sb.String()
 }
 
 func (n *Node[Key, Value]) IsLeaf() bool {
@@ -60,12 +65,6 @@ func (n *Node[Key, Value]) minNode() *Node[Key, Value] {
 		return n
 	}
 	return n.minNode()
-}
-
-type Comparator[Key any] func(a, b Key) int
-
-func NewBinTree[Key, Value any](comp Comparator[Key]) *BinTree[Key, Value] {
-	return &BinTree[Key, Value]{cmp: comp}
 }
 
 func (bt *BinTree[Key, Value]) Size() int {
@@ -85,14 +84,14 @@ func (bt *BinTree[Key, Value]) put(
 	}
 	cmp := bt.cmp(node.Key, key)
 	switch {
-	case cmp < 0:
-		return bt.put(node.Left, key, val)
 	case cmp > 0:
-		return bt.put(node.Right, key, val)
+		node.Left = bt.put(node.Left, key, val)
+	case cmp < 0:
+		node.Right = bt.put(node.Right, key, val)
 	default:
 		node.Value = val
-		return node
 	}
+	return node
 }
 
 func (bt *BinTree[Key, Value]) Get(key Key) (Value, bool) {
@@ -113,6 +112,43 @@ func (bt *BinTree[Key, Value]) get(node *Node[Key, Value], key Key) (Value, bool
 	default:
 		return node.Value, true
 	}
+}
+
+type TraversalAction[Key, Value any] func(Key, Value)
+type TraversalActionNode[Key, Value any] func(*Node[Key, Value])
+
+func (bt *BinTree[Key, Value]) PreOrderTraversal(
+	ta TraversalAction[Key, Value],
+) {
+	bt.preOrderTraversal(bt.head, ta)
+}
+
+func (bt *BinTree[Key, Value]) preOrderTraversal(
+	node *Node[Key, Value], ta TraversalAction[Key, Value],
+) {
+	if node == nil {
+		return
+	}
+	ta(node.Key, node.Value)
+	bt.preOrderTraversal(node.Left, ta)
+	bt.preOrderTraversal(node.Right, ta)
+}
+
+func (bt *BinTree[Key, Value]) PreOrderTraversalNode(
+	ta TraversalActionNode[Key, Value],
+) {
+	bt.preOrderTraversalNode(bt.head, ta)
+}
+
+func (bt *BinTree[Key, Value]) preOrderTraversalNode(
+	node *Node[Key, Value], ta TraversalActionNode[Key, Value],
+) {
+	if node == nil {
+		return
+	}
+	ta(node)
+	bt.preOrderTraversalNode(node.Left, ta)
+	bt.preOrderTraversalNode(node.Right, ta)
 }
 
 func (bt *BinTree[Key, Value]) Delete(key Key) {
