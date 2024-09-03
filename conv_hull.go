@@ -9,12 +9,16 @@ type ConvexHull struct {
 	Points []Point
 }
 
+func (p Point) CheckTurn(q Point) float64 {
+	return p.X*q.Y - p.Y*q.X
+}
+
 func NewConvexHull(points []Point) *ConvexHull {
 	sort.Sort(ByPointX(points))
 	fmt.Println(points)
 	is_left_turn := func(a, b, c Point) bool {
-		fmt.Println(a.Subtract(b).VectMult(b.Subtract(c)))
-		return a.Subtract(b).VectMult(b.Subtract(c)) <= 0
+		fmt.Println(a.Subtract(b).CheckTurn(b.Subtract(c)))
+		return a.Subtract(b).CheckTurn(b.Subtract(c)) <= 0
 	}
 	L_up := []Point{points[0], points[1]}
 	for i := 2; i < len(points); i++ {
