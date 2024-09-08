@@ -1,6 +1,7 @@
 package bintree
 
 import (
+	// "fmt"
 	"testing"
 )
 
@@ -115,5 +116,29 @@ func TestBinTreeString(t *testing.T) {
 	wanted := "[ (3 3) (2 2) (1 1) (4 4) ]"
 	if bt.String() != wanted {
 		t.Errorf("wanted %s, got %v", wanted, bt)
+	}
+}
+
+func TestNodeDelete(t *testing.T) {
+	bt := NewBinTree[int, int](cmpInt)
+	bt.Put(3, 3)
+	bt.Put(2, 2)
+	bt.Put(4, 4)
+	bt.Put(1, 1)
+	bt.Delete(1)
+	wanted := "[ (3 3) (2 2) (4 4) ]"
+	if bt.String() != wanted {
+		t.Errorf("wanted %s, got %v", wanted, bt)
+	}
+
+	bt1 := NewBinTree[int, int](cmpInt)
+	bt1.Put(3, 3)
+	bt1.Put(2, 2)
+	bt1.Put(4, 4)
+	bt1.Put(1, 1)
+	bt1.Delete(3)
+	wanted = "[ (4 4) (2 2) (1 1) ]"
+	if bt1.String() != wanted {
+		t.Errorf("wanted %s, got %v", wanted, bt1)
 	}
 }

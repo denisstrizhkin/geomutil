@@ -162,13 +162,14 @@ func (bt *BinTree[Key, Value]) delete(node *Node[Key, Value], key Key) *Node[Key
 	cmp := bt.cmp(node.Key, key)
 	switch {
 	case cmp > 0:
-		return bt.delete(node.Left, key)
+		node.Left = bt.delete(node.Left, key)
 	case cmp < 0:
-		return bt.delete(node.Right, key)
+		node.Right = bt.delete(node.Right, key)
 	default:
 		bt.count--
-		return bt.deleteAt(node)
+		node = bt.deleteAt(node)
 	}
+	return node
 }
 
 func (bt *BinTree[Key, Value]) deleteAt(node *Node[Key, Value]) *Node[Key, Value] {
@@ -180,7 +181,8 @@ func (bt *BinTree[Key, Value]) deleteAt(node *Node[Key, Value]) *Node[Key, Value
 	default:
 		nodeMin := node.Right.minNode()
 		node.Value = nodeMin.Value
-		bt.deleteAt(nodeMin)
+		node.Key = nodeMin.Key
+		node.Right = bt.delete(node.Right, nodeMin.Key)
 		return node
 	}
 }
