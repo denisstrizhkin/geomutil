@@ -148,3 +148,36 @@ func TestNodeDelete(t *testing.T) {
 		t.Errorf("supposed number of elements %d, but recieved %d", 3, bt1.count)
 	}
 }
+
+func TestTreeBalancing(t *testing.T) {
+	btr := NewBinTree[int, int](cmpInt)
+	btr.Put(3, 3)
+	btr.Put(4, 4)
+	btr.Put(1, 1)
+	btr.Put(2, 2)
+	btr.head = btr.head.rightRotation()
+	wantedr := "[ (1 1) (3 3) (2 2) (4 4) ]"
+	if btr.String() != wantedr {
+		t.Errorf("Right Rotation is incorrect: wanted %s, recieved %v", wantedr, btr)
+	}
+
+	btl := NewBinTree[int, int](cmpInt)
+	btl.Put(2, 2)
+	btl.Put(1, 1)
+	btl.Put(4, 4)
+	btl.Put(3, 3)
+	btl.head = btl.head.leftRotation()
+	wantedl := "[ (4 4) (2 2) (1 1) (3 3) ]"
+	if btl.String() != wantedl {
+		t.Errorf("Left Rotation is incorrect: wanted %s, recieved %v", wantedl, btl)
+	}
+
+	bt := NewBinTree[int, int](cmpInt)
+	bt.Put(4, 4)
+	bt.Put(3, 3)
+	bt.Put(2, 2)
+	bt.Put(1, 1)
+	if !bt.IsBalanced() {
+		t.Errorf("Tree is not balanced! (Where is AVL, bro, wtf?)")
+	}
+}
