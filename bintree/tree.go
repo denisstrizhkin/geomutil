@@ -166,7 +166,6 @@ func (bt *BinTree[Key, Value]) delete(node *Node[Key, Value], key Key) *Node[Key
 	case cmp < 0:
 		node.Right = bt.delete(node.Right, key)
 	default:
-		bt.count--
 		node = bt.deleteAt(node)
 	}
 	return node
@@ -175,8 +174,10 @@ func (bt *BinTree[Key, Value]) delete(node *Node[Key, Value], key Key) *Node[Key
 func (bt *BinTree[Key, Value]) deleteAt(node *Node[Key, Value]) *Node[Key, Value] {
 	switch {
 	case node.Left == nil:
+		bt.count--
 		return node.Right
 	case node.Right == nil:
+		bt.count--
 		return node.Left
 	default:
 		nodeMin := node.Right.minNode()

@@ -130,6 +130,9 @@ func TestNodeDelete(t *testing.T) {
 	if bt.String() != wanted {
 		t.Errorf("wanted %s, got %v", wanted, bt)
 	}
+	if bt.count != 3 {
+		t.Errorf("supposed number of elements %d, but recieved %d", 3, bt.count)
+	}
 
 	bt1 := NewBinTree[int, int](cmpInt)
 	bt1.Put(3, 3)
@@ -140,5 +143,8 @@ func TestNodeDelete(t *testing.T) {
 	wanted = "[ (4 4) (2 2) (1 1) ]"
 	if bt1.String() != wanted {
 		t.Errorf("wanted %s, got %v", wanted, bt1)
+	}
+	if bt1.count != 3 {
+		t.Errorf("supposed number of elements %d, but recieved %d", 3, bt1.count)
 	}
 }
