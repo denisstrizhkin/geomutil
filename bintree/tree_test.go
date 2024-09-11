@@ -1,7 +1,7 @@
 package bintree
 
 import (
-	// "fmt"
+	"fmt"
 	"testing"
 )
 
@@ -173,11 +173,17 @@ func TestTreeBalancing(t *testing.T) {
 	}
 
 	bt := NewBinTree[int, int](cmpInt)
-	bt.Put(4, 4)
-	bt.Put(3, 3)
 	bt.Put(2, 2)
 	bt.Put(1, 1)
+	bt.Put(4, 4)
+	bt.Put(3, 3)
+	bt.Put(5, 5)
+	bt.Put(6, 6)
+	fmt.Println(bt.String())
 	if !bt.IsBalanced() {
 		t.Errorf("Tree is not balanced! (Where is AVL, bro, wtf?)")
+	}
+	if bt.head.Left.h != 2 {
+		t.Errorf("Height parameters are not relevant. Expected %d, but recieved %d", 2, bt.head.Left.h)
 	}
 }
