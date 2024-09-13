@@ -1,9 +1,11 @@
 package main
 
 import (
+	"log"
+	"math"
+
 	geomutil "github.com/denisstrizhkin/geomutil"
 	rl "github.com/gen2brain/raylib-go/raylib"
-	"math"
 )
 
 const (
@@ -11,6 +13,9 @@ const (
 	MOUSE_SENS    = 100
 	WINDOW_WIDTH  = 800
 	WINDOW_HEIGHT = 450
+
+	MODE_MOVE = 0
+	MODE_ADD  = 1
 )
 
 func pointToVector2(p geomutil.Point) rl.Vector2 {
@@ -86,15 +91,38 @@ func main() {
 	cameraZoom := getDefaultZoom(points)
 	camera := rl.NewCamera2D(cameraOffset, cameraTarget, 0, cameraZoom)
 
+	mode := uint8(MODE_MOVE)
+	mode_text := ""
+
 	rl.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "geomutil test")
 	defer rl.CloseWindow()
 	rl.SetTargetFPS(60)
 	for !rl.WindowShouldClose() {
+		switch mode {
+		case MODE_MOVE:
+			mode_text = "MOVE"
+			updateCamera(&camera)
+		case MODE_ADD:
+			mode_text = "ADD"
+			if rl.IsMouseButtonDown(rl.MouseButtonLeft) {
+				pos := rl.GetMousePosition()
+				log.Print(pos)
+				pos = rl.Vector2Scale(pos, 1/camera.Zoom)
+				log.Print(pos)
+				points = append(
+					points, geomutil.Point{X: float64(pos.X), Y: float64(pos.Y)},
+				)
+				gh = geomutil.NewConvexHull(points)
+			}
+		default:
+			log.Fatal("Unknown mode:", mode)
+		}
+
 		rl.BeginDrawing()
 		rl.BeginMode2D(camera)
-		updateCamera(&camera)
 
 		rl.ClearBackground(rl.RayWhite)
+		rl.DrawText(mode_text, 5, 5, 20, rl.Black)
 		plotPoints(points, 2, rl.Yellow)
 		plotPoints(gh.Points, 2, rl.Red)
 		plotPolygon(gh.Points, 4, rl.Green)
