@@ -6,15 +6,15 @@ import (
 )
 
 type Node[Key, Value any] struct {
-	Key   Key
-	Value Value
-	Left  *Node[Key, Value]
-	Right *Node[Key, Value]
-	h     int
+	Key    Key
+	Value  Value
+	Left   *Node[Key, Value]
+	Right  *Node[Key, Value]
+	height int
 }
 
 func NewNode[Key, Value any](key Key, val Value) *Node[Key, Value] {
-	return &Node[Key, Value]{Key: key, Value: val, h: 1}
+	return &Node[Key, Value]{Key: key, Value: val}
 }
 
 // func (n *Node[T]) insertLeftNode(val T) *Node[T] {
@@ -93,9 +93,6 @@ func (n *Node[Key, Value]) rightRotation() *Node[Key, Value] {
 
 func (bt *BinTree[Key, Value]) Put(key Key, val Value) {
 	bt.head = bt.put(bt.head, key, val)
-	if !bt.IsBalanced() {
-		bt.head = bt.balance(bt.head, key)
-	}
 }
 
 func (bt *BinTree[Key, Value]) put(
@@ -114,20 +111,23 @@ func (bt *BinTree[Key, Value]) put(
 	default:
 		node.Value = val
 	}
-	node.h = node.updateHeight()
+	if absInt(node.getBF()) > 1 {
+		node = bt.balance(node)
+	}
+	node.updateHeight()
 	return node
 }
 
-func (n *Node[Key, Value]) updateHeight() int {
+func (n *Node[Key, Value]) updateHeight() {
 	switch {
 	case n.IsLeaf():
-		return 1
+		n.height = 1
 	case n.Left == nil:
-		return n.Right.h + 1
+		n.height = n.Right.height + 1
 	case n.Right == nil:
-		return n.Left.h + 1
+		n.height = n.Left.height + 1
 	default:
-		return max(n.Left.h, n.Right.h) + 1
+		n.height = max(n.Left.height, n.Right.height) + 1
 	}
 }
 
@@ -225,37 +225,32 @@ func (bt *BinTree[Key, Value]) deleteAt(node *Node[Key, Value]) *Node[Key, Value
 	}
 }
 
-func (bt *BinTree[Key, Value]) balance(node *Node[Key, Value], key Key) *Node[Key, Value] {
-	bf := node.getBF()
-	cmp := bt.cmp(key, node.Left.Key)
-	switch {
-	case bf > 1 && cmp < 0:
-		return node.rightRotation()
-	case bf < -1 && cmp > 0:
+func (bt *BinTree[Key, Value]) balance(node *Node[Key, Value]) *Node[Key, Value] {
+	if node.Left == nil || node.Right.height > node.Left.height {
+		if node.Right.getBF() < 0 {
+			node.Right = node.Right.rightRotation()
+		}
 		return node.leftRotation()
-	case bf > 1 && cmp > 0:
-		node.Left = node.leftRotation()
+	}
+	if node.Right == nil || node.Left.height > node.Right.height {
+		if node.Left.getBF() > 0 {
+			node.Left = node.Left.leftRotation()
+		}
 		return node.rightRotation()
-	case bf < -1 && cmp < 0:
-		node.Right = node.rightRotation()
-		return node.leftRotation()
 	}
 	return node
 }
 
 func (n *Node[Key, Value]) getBF() int {
-	switch {
-	case n == nil:
-		return 0
-	case n.IsLeaf():
-		return 1
-	case n.Right == nil:
-		return n.Left.h
-	case n.Left == nil:
-		return n.Right.h
-	default:
-		return n.Left.h - n.Right.h
+	leftHeight := 0
+	if n.Left != nil {
+		leftHeight = n.Left.height
 	}
+	rightHeight := 0
+	if n.Right != nil {
+		rightHeight = n.Right.height
+	}
+	return rightHeight - leftHeight
 }
 
 func absInt(a int) int {
@@ -263,27 +258,4 @@ func absInt(a int) int {
 		return -a
 	}
 	return a
-}
-
-func (bt *BinTree[Key, Value]) isBalanced(node *Node[Key, Value]) int {
-	if node == nil {
-		return 0
-	}
-	lh := bt.isBalanced(node.Left)
-	if lh == -1 {
-		return -1
-	}
-	rh := bt.isBalanced(node.Right)
-	if rh == -1 {
-		return -1
-	}
-
-	if absInt(lh-rh) > 1 {
-		return -1
-	}
-	return max(lh, rh) + 1
-}
-
-func (bt *BinTree[Key, Value]) IsBalanced() bool {
-	return bt.isBalanced(bt.head) > 0
 }
