@@ -90,10 +90,19 @@ func TestGet(t *testing.T) {
 }
 
 func TestNodeString(t *testing.T) {
-	n := NewNode(1, "Rika")
-	wanted := "(1| 1: Rika)"
-	if n.String() != wanted {
-		t.Error(strWantedGot("", wanted, n))
+	a := NewNode(1, "Rika")
+	{
+		wanted := "(1| 1: Rika)"
+		if a.String() != wanted {
+			t.Error(strWantedGot("", wanted, a))
+		}
+	}
+	var b *Node[int, string]
+	{
+		wanted := "<nil>"
+		if b.String() != wanted {
+			t.Error(strWantedGot("", wanted, b))
+		}
 	}
 }
 

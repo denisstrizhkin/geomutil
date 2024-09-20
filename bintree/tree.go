@@ -28,7 +28,10 @@ func NewNode[Key, Value any](key Key, val Value) *Node[Key, Value] {
 // }
 
 func (n *Node[Key, Value]) String() string {
-	return fmt.Sprintf("(%v| %v: %v)", n.height, n.Key, n.Value)
+	if n != nil {
+		return fmt.Sprintf("(%v| %v: %v)", n.height, n.Key, n.Value)
+	}
+	return fmt.Sprint(nil)
 }
 
 type Comparator[Key any] func(a, b Key) int
@@ -205,6 +208,10 @@ func (bt *BinTree[Key, Value]) delete(node *Node[Key, Value], key Key) *Node[Key
 	default:
 		node = bt.deleteAt(node)
 	}
+	if node.getBF()*node.getBF() > 1 {
+		node = bt.balance(node)
+	}
+	node.updateHeight()
 	return node
 }
 
