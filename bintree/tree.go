@@ -17,29 +17,25 @@ func NewNode[Key, Value any](key Key, val Value) *Node[Key, Value] {
 	return &Node[Key, Value]{height: 1, Key: key, Value: val}
 }
 
-// func (n *Node[T]) insertLeftNode(val T) *Node[T] {
-// 	n.Left = newNode(val)
-// 	return n.Left
-// }
-
-// func (n *Node[T]) insertRightNode(val T) *Node[T] {
-// 	n.Right = newNode(val)
-// 	return n.Right
-// }
-
 func (n *Node[Key, Value]) String() string {
-	if n != nil {
-		return fmt.Sprintf("(%v| %v: %v)", n.height, n.Key, n.Value)
+	if n == nil {
+		return fmt.Sprint(nil)
 	}
-	return fmt.Sprint(nil)
+	return fmt.Sprintf("(%v| %v: %v)", n.height, n.Key, n.Value)
+}
+
+func (n *Node[Key, Value]) getHeight() int {
+	if n == nil {
+		return 0
+	}
+	return n.height
 }
 
 type Comparator[Key any] func(a, b Key) int
 
 type BinTree[Key, Value any] struct {
-	head  *Node[Key, Value]
-	cmp   Comparator[Key]
-	count int
+	head *Node[Key, Value]
+	cmp  Comparator[Key]
 }
 
 func NewBinTree[Key, Value any](comp Comparator[Key]) *BinTree[Key, Value] {
@@ -47,8 +43,11 @@ func NewBinTree[Key, Value any](comp Comparator[Key]) *BinTree[Key, Value] {
 }
 
 func (bt *BinTree[Key, Value]) String() string {
+	if bt == nil {
+		return fmt.Sprint(nil)
+	}
 	var sb strings.Builder
-	sb.WriteString(fmt.Sprint(bt.Size(), "| [ "))
+	sb.WriteString("[ ")
 	bt.PreOrderTraversalNode(func(node *Node[Key, Value]) {
 		sb.WriteString(node.String())
 		sb.WriteRune(' ')
@@ -57,23 +56,14 @@ func (bt *BinTree[Key, Value]) String() string {
 	return sb.String()
 }
 
-func (n *Node[Key, Value]) IsLeaf() bool {
-	return n.Left == nil && n.Right == nil
-}
-
-func (n *Node[Key, Value]) IsFull() bool {
-	return n.Left != nil && n.Right != nil
-}
-
 func (n *Node[Key, Value]) minNode() *Node[Key, Value] {
+	if n == nil {
+		return nil
+	}
 	if n.Left == nil {
 		return n
 	}
 	return n.minNode()
-}
-
-func (bt *BinTree[Key, Value]) Size() int {
-	return bt.count
 }
 
 func (n *Node[Key, Value]) leftRotation() *Node[Key, Value] {
@@ -102,7 +92,6 @@ func (bt *BinTree[Key, Value]) put(
 	node *Node[Key, Value], key Key, val Value,
 ) *Node[Key, Value] {
 	if node == nil {
-		bt.count++
 		return NewNode(key, val)
 	}
 	cmp := bt.cmp(node.Key, key)
@@ -115,22 +104,15 @@ func (bt *BinTree[Key, Value]) put(
 		node.Value = val
 	}
 	if node.getBF()*node.getBF() > 1 {
-		node = bt.balance(node)
+		node = node.balance()
 	}
 	node.updateHeight()
 	return node
 }
 
 func (n *Node[Key, Value]) updateHeight() {
-	switch {
-	case n.IsLeaf():
-		n.height = 1
-	case n.Left == nil:
-		n.height = n.Right.height + 1
-	case n.Right == nil:
-		n.height = n.Left.height + 1
-	default:
-		n.height = max(n.Left.height, n.Right.height) + 1
+	if n != nil {
+		n.height = max(n.Left.getHeight(), n.Right.getHeight()) + 1
 	}
 }
 
@@ -192,70 +174,58 @@ func (bt *BinTree[Key, Value]) preOrderTraversalNode(
 }
 
 func (bt *BinTree[Key, Value]) Delete(key Key) {
-	bt.head = bt.delete(bt.head, key)
+	bt.head = bt.head.delete(key, bt.cmp)
 }
 
-func (bt *BinTree[Key, Value]) delete(node *Node[Key, Value], key Key) *Node[Key, Value] {
+func (node *Node[Key, Value]) delete(key Key, cmp Comparator[Key]) *Node[Key, Value] {
 	if node == nil {
 		return nil
 	}
-	cmp := bt.cmp(node.Key, key)
+	c := cmp(node.Key, key)
 	switch {
-	case cmp > 0:
-		node.Left = bt.delete(node.Left, key)
-	case cmp < 0:
-		node.Right = bt.delete(node.Right, key)
+	case c > 0:
+		node.Left = node.Left.delete(key, cmp)
+	case c < 0:
+		node.Right = node.Right.delete(key, cmp)
 	default:
-		node = bt.deleteAt(node)
+		switch {
+		case node.Left == nil:
+			node = node.Right
+		case node.Right == nil:
+			node = node.Left
+		default:
+			nodeMin := node.Right.minNode()
+			node.Value = nodeMin.Value
+			node.Key = nodeMin.Key
+			node.Right = node.Right.delete(nodeMin.Key, cmp)
+		}
 	}
 	if node.getBF()*node.getBF() > 1 {
-		node = bt.balance(node)
+		node = node.balance()
 	}
 	node.updateHeight()
 	return node
 }
 
-func (bt *BinTree[Key, Value]) deleteAt(node *Node[Key, Value]) *Node[Key, Value] {
-	switch {
-	case node.Left == nil:
-		bt.count--
-		return node.Right
-	case node.Right == nil:
-		bt.count--
-		return node.Left
-	default:
-		nodeMin := node.Right.minNode()
-		node.Value = nodeMin.Value
-		node.Key = nodeMin.Key
-		node.Right = bt.delete(node.Right, nodeMin.Key)
-		return node
-	}
-}
-
-func (bt *BinTree[Key, Value]) balance(node *Node[Key, Value]) *Node[Key, Value] {
-	if node.getBF() > 0 {
-		if node.Right.getBF() < 0 {
-			node.Right = node.Right.rightRotation()
+func (n *Node[Key, Value]) balance() *Node[Key, Value] {
+	if n.getBF() > 0 {
+		if n.Right.getBF() < 0 {
+			n.Right = n.Right.rightRotation()
 		}
-		return node.leftRotation()
+		return n.leftRotation()
 	}
-	if node.getBF() < 0 {
-		if node.Left.getBF() > 0 {
-			node.Left = node.Left.leftRotation()
+	if n.getBF() < 0 {
+		if n.Left.getBF() > 0 {
+			n.Left = n.Left.leftRotation()
 		}
-		return node.rightRotation()
+		return n.rightRotation()
 	}
-	return node
+	return n
 }
 
 func (n *Node[Key, Value]) getBF() int {
-	leftHeight := 0
-	if n.Left != nil {
-		leftHeight = n.Left.height
+	if n == nil {
+		return 0
 	}
-	rightHeight := 0
-	if n.Right != nil {
-		rightHeight = n.Right.height
-	}
-	return rightHeight - leftHeight
+	return n.Right.getHeight() - n.Left.getHeight()
 }

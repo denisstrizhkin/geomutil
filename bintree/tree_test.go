@@ -26,25 +26,25 @@ func TestPut(t *testing.T) {
 	}{
 		{
 			func() { bt = NewBinTree[int, string](cmpInt) },
-			"0| [ ]",
+			"[ ]",
 		}, {
 			func() { bt.Put(3, "Mion") },
-			"1| [ (1| 3: Mion) ]",
+			"[ (1| 3: Mion) ]",
 		}, {
 			func() { bt.Put(1, "Shion") },
-			"2| [ (2| 3: Mion) (1| 1: Shion) ]",
+			"[ (2| 3: Mion) (1| 1: Shion) ]",
 		}, {
 			func() { bt.Put(4, "Misaki") },
-			"3| [ (2| 3: Mion) (1| 1: Shion) (1| 4: Misaki) ]",
+			"[ (2| 3: Mion) (1| 1: Shion) (1| 4: Misaki) ]",
 		}, {
 			func() { bt.Put(0, "Rena") },
-			"4| [ (3| 3: Mion) (2| 1: Shion) (1| 0: Rena) (1| 4: Misaki) ]",
+			"[ (3| 3: Mion) (2| 1: Shion) (1| 0: Rena) (1| 4: Misaki) ]",
 		}, {
 			func() { bt.Put(5, "Sakura") },
-			"5| [ (3| 3: Mion) (2| 1: Shion) (1| 0: Rena) (2| 4: Misaki) (1| 5: Sakura) ]",
+			"[ (3| 3: Mion) (2| 1: Shion) (1| 0: Rena) (2| 4: Misaki) (1| 5: Sakura) ]",
 		}, {
 			func() { bt.Put(2, "Rosa") },
-			"6| [ (3| 3: Mion) (2| 1: Shion) (1| 0: Rena) (1| 2: Rosa) (2| 4: Misaki) (1| 5: Sakura) ]",
+			"[ (3| 3: Mion) (2| 1: Shion) (1| 0: Rena) (1| 2: Rosa) (2| 4: Misaki) (1| 5: Sakura) ]",
 		},
 	}
 	for _, testCase := range cases {
@@ -77,7 +77,7 @@ func TestGet(t *testing.T) {
 		{func() (string, bool) { return bt.Get(0) }, "Rena", true},
 		{func() (string, bool) { return bt.Get(10) }, "", false},
 	}
-	wanted := "4| [ (3| 3: Mion) (2| 1: Shion) (1| 0: Rena) (1| 4: Misaki) ]"
+	wanted := "[ (3| 3: Mion) (2| 1: Shion) (1| 0: Rena) (1| 4: Misaki) ]"
 	for _, testCase := range cases {
 		got, ok := testCase.Action()
 		if testCase.Want != got || testCase.Ok != ok {
@@ -115,7 +115,7 @@ func TestBinTreeString(t *testing.T) {
 	if bt.head.getBF()*bt.head.getBF() > 1 {
 		t.Errorf("Your tree is not balanced!")
 	}
-	wanted := "4| [ (3| 30: a) (2| 20: d) (1| 10: m) (1| 40: w) ]"
+	wanted := "[ (3| 30: a) (2| 20: d) (1| 10: m) (1| 40: w) ]"
 	if bt.String() != wanted {
 		t.Error(strWantedGot("", wanted, bt))
 	}
@@ -128,12 +128,9 @@ func TestNodeDelete(t *testing.T) {
 	bt.Put(4, 4)
 	bt.Put(1, 1)
 	bt.Delete(1)
-	wanted := "3| [ (3 3) (2 2) (4 4) ]"
+	wanted := "[ (2| 3: 3) (1| 2: 2) (1| 4: 4) ]"
 	if bt.String() != wanted {
 		t.Error(strWantedGot("", wanted, bt))
-	}
-	if bt.count != 3 {
-		t.Errorf("supposed number of elements %d, but recieved %d", 3, bt.count)
 	}
 
 	bt1 := NewBinTree[int, int](cmpInt)
@@ -142,12 +139,9 @@ func TestNodeDelete(t *testing.T) {
 	bt1.Put(4, 4)
 	bt1.Put(1, 1)
 	bt1.Delete(3)
-	wanted = "3| [ (4 4) (2 2) (1 1) ]"
+	wanted = "[ (2| 2: 2) (1| 1: 1) (1| 4: 4) ]"
 	if bt1.String() != wanted {
 		t.Error(strWantedGot("", wanted, bt1))
-	}
-	if bt1.count != 3 {
-		t.Errorf("supposed number of elements %d, but recieved %d", 3, bt1.count)
 	}
 }
 
@@ -159,14 +153,14 @@ func TestRightRotation(t *testing.T) {
 	bt.Put(1, "m")
 	bt.Put(3, "h")
 	{
-		wanted := "5| [ (3| 4: z) (2| 2: a) (1| 1: m) (1| 3: h) (1| 5: u) ]"
+		wanted := "[ (3| 4: z) (2| 2: a) (1| 1: m) (1| 3: h) (1| 5: u) ]"
 		if bt.String() != wanted {
 			t.Error(strWantedGot("", wanted, bt))
 		}
 	}
 	bt.head = bt.head.rightRotation()
 	{
-		wanted := "5| [ (3| 2: a) (1| 1: m) (2| 4: z) (1| 3: h) (1| 5: u) ]"
+		wanted := "[ (3| 2: a) (1| 1: m) (2| 4: z) (1| 3: h) (1| 5: u) ]"
 		if bt.String() != wanted {
 			t.Error(strWantedGot("Right rotation is incorrect", wanted, bt))
 		}
@@ -181,14 +175,14 @@ func TestLeftRotation(t *testing.T) {
 	bt.Put(3, "h")
 	bt.Put(5, "u")
 	{
-		wanted := "5| [ (3| 2: z) (1| 1: a) (2| 4: m) (1| 3: h) (1| 5: u) ]"
+		wanted := "[ (3| 2: z) (1| 1: a) (2| 4: m) (1| 3: h) (1| 5: u) ]"
 		if bt.String() != wanted {
 			t.Error(strWantedGot("", wanted, bt))
 		}
 	}
 	bt.head = bt.head.leftRotation()
 	{
-		wanted := "5| [ (3| 4: m) (2| 2: z) (1| 1: a) (1| 3: h) (1| 5: u) ]"
+		wanted := "[ (3| 4: m) (2| 2: z) (1| 1: a) (1| 3: h) (1| 5: u) ]"
 		if bt.String() != wanted {
 			t.Error(strWantedGot("Left rotation is incorrect", wanted, bt))
 		}
@@ -200,14 +194,14 @@ func TestTestBalanceRight(t *testing.T) {
 	bt.Put(4, "d")
 	bt.Put(2, "b")
 	{
-		wanted := "2| [ (2| 4: d) (1| 2: b) ]"
+		wanted := "[ (2| 4: d) (1| 2: b) ]"
 		if bt.String() != wanted {
 			t.Error(strWantedGot("", wanted, bt))
 		}
 	}
 	bt.Put(1, "a")
 	{
-		wanted := "3| [ (2| 2: b) (1| 1: a) (1| 4: d) ]"
+		wanted := "[ (2| 2: b) (1| 1: a) (1| 4: d) ]"
 		if bt.String() != wanted {
 			t.Error(strWantedGot("", wanted, bt))
 		}
@@ -219,14 +213,14 @@ func TestTestBalanceLeftRight(t *testing.T) {
 	bt.Put(4, "d")
 	bt.Put(2, "b")
 	{
-		wanted := "2| [ (2| 4: d) (1| 2: b) ]"
+		wanted := "[ (2| 4: d) (1| 2: b) ]"
 		if bt.String() != wanted {
 			t.Error(strWantedGot("", wanted, bt))
 		}
 	}
 	bt.Put(3, "c")
 	{
-		wanted := "3| [ (2| 3: c) (1| 2: b) (1| 4: d) ]"
+		wanted := "[ (2| 3: c) (1| 2: b) (1| 4: d) ]"
 		if bt.String() != wanted {
 			t.Error(strWantedGot("", wanted, bt))
 		}
@@ -238,14 +232,14 @@ func TestTestBalanceLeft(t *testing.T) {
 	bt.Put(1, "a")
 	bt.Put(2, "b")
 	{
-		wanted := "2| [ (2| 1: a) (1| 2: b) ]"
+		wanted := "[ (2| 1: a) (1| 2: b) ]"
 		if bt.String() != wanted {
 			t.Error(strWantedGot("", wanted, bt))
 		}
 	}
 	bt.Put(4, "d")
 	{
-		wanted := "3| [ (2| 2: b) (1| 1: a) (1| 4: d) ]"
+		wanted := "[ (2| 2: b) (1| 1: a) (1| 4: d) ]"
 		if bt.String() != wanted {
 			t.Error(strWantedGot("", wanted, bt))
 		}
@@ -257,14 +251,14 @@ func TestTestBalanceRightLeft(t *testing.T) {
 	bt.Put(1, "a")
 	bt.Put(2, "b")
 	{
-		wanted := "2| [ (2| 1: a) (1| 2: b) ]"
+		wanted := "[ (2| 1: a) (1| 2: b) ]"
 		if bt.String() != wanted {
 			t.Error(strWantedGot("", wanted, bt))
 		}
 	}
 	bt.Put(3, "c")
 	{
-		wanted := "3| [ (2| 2: b) (1| 1: a) (1| 3: c) ]"
+		wanted := "[ (2| 2: b) (1| 1: a) (1| 3: c) ]"
 		if bt.String() != wanted {
 			t.Error(strWantedGot("", wanted, bt))
 		}
