@@ -14,7 +14,7 @@ type Node[Key, Value any] struct {
 }
 
 func NewNode[Key, Value any](key Key, val Value) *Node[Key, Value] {
-	return &Node[Key, Value]{Key: key, Value: val}
+	return &Node[Key, Value]{height: 1, Key: key, Value: val}
 }
 
 // func (n *Node[T]) insertLeftNode(val T) *Node[T] {
@@ -28,7 +28,7 @@ func NewNode[Key, Value any](key Key, val Value) *Node[Key, Value] {
 // }
 
 func (n *Node[Key, Value]) String() string {
-	return fmt.Sprintf("(%v %v)", n.Key, n.Value)
+	return fmt.Sprintf("(%v| %v: %v)", n.height, n.Key, n.Value)
 }
 
 type Comparator[Key any] func(a, b Key) int
@@ -45,7 +45,7 @@ func NewBinTree[Key, Value any](comp Comparator[Key]) *BinTree[Key, Value] {
 
 func (bt *BinTree[Key, Value]) String() string {
 	var sb strings.Builder
-	sb.WriteString("[ ")
+	sb.WriteString(fmt.Sprint(bt.Size(), "| [ "))
 	bt.PreOrderTraversalNode(func(node *Node[Key, Value]) {
 		sb.WriteString(node.String())
 		sb.WriteRune(' ')
