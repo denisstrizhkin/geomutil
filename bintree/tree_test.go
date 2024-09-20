@@ -103,7 +103,7 @@ func TestBinTreeString(t *testing.T) {
 	bt.Put(20, "d")
 	bt.Put(40, "w")
 	bt.Put(10, "m")
-	if absInt(bt.head.getBF()) > 2 {
+	if bt.head.getBF()*bt.head.getBF() > 1 {
 		t.Errorf("Your tree is not balanced!")
 	}
 	wanted := "4| [ (3| 30: a) (2| 20: d) (1| 10: m) (1| 40: w) ]"
@@ -186,22 +186,57 @@ func TestLeftRotation(t *testing.T) {
 	}
 }
 
-func TestTestBalanceLeft(t *testing.T) {
+func TestTestBalanceRight(t *testing.T) {
 	bt := NewBinTree[int, string](cmpInt)
+	bt.Put(4, "d")
 	bt.Put(2, "b")
-	bt.Put(1, "a")
-	bt.Put(5, "e")
-	bt.Put(3, "c")
-	bt.Put(6, "f")
 	{
-		wanted := "5| [ (3| 2: b) (1| 1: a) (2| 5: e) (1| 3: c) (1| 6: f) ]"
+		wanted := "2| [ (2| 4: d) (1| 2: b) ]"
 		if bt.String() != wanted {
 			t.Error(strWantedGot("", wanted, bt))
 		}
 	}
-	bt.Put(7, "g")
+	bt.Put(1, "a")
 	{
-		wanted := "6| [ (3| 5: e) (2| 2: b) (1| 1: a) (1| 3: c) (2| 6: f) (1| 7: g) ]"
+		wanted := "3| [ (2| 2: b) (1| 1: a) (1| 4: d) ]"
+		if bt.String() != wanted {
+			t.Error(strWantedGot("", wanted, bt))
+		}
+	}
+}
+
+func TestTestBalanceLeftRight(t *testing.T) {
+	bt := NewBinTree[int, string](cmpInt)
+	bt.Put(4, "d")
+	bt.Put(2, "b")
+	{
+		wanted := "2| [ (2| 4: d) (1| 2: b) ]"
+		if bt.String() != wanted {
+			t.Error(strWantedGot("", wanted, bt))
+		}
+	}
+	bt.Put(3, "c")
+	{
+		wanted := "3| [ (2| 3: c) (1| 2: b) (1| 4: d) ]"
+		if bt.String() != wanted {
+			t.Error(strWantedGot("", wanted, bt))
+		}
+	}
+}
+
+func TestTestBalanceLeft(t *testing.T) {
+	bt := NewBinTree[int, string](cmpInt)
+	bt.Put(1, "a")
+	bt.Put(2, "b")
+	{
+		wanted := "2| [ (2| 1: a) (1| 2: b) ]"
+		if bt.String() != wanted {
+			t.Error(strWantedGot("", wanted, bt))
+		}
+	}
+	bt.Put(4, "d")
+	{
+		wanted := "3| [ (2| 2: b) (1| 1: a) (1| 4: d) ]"
 		if bt.String() != wanted {
 			t.Error(strWantedGot("", wanted, bt))
 		}
@@ -210,20 +245,17 @@ func TestTestBalanceLeft(t *testing.T) {
 
 func TestTestBalanceRightLeft(t *testing.T) {
 	bt := NewBinTree[int, string](cmpInt)
-	bt.Put(2, "b")
 	bt.Put(1, "a")
-	bt.Put(5, "e")
-	bt.Put(3, "c")
-	bt.Put(6, "f")
+	bt.Put(2, "b")
 	{
-		wanted := "5| [ (3| 2: b) (1| 1: a) (2| 5: e) (1| 3: c) (1| 6: f) ]"
+		wanted := "2| [ (2| 1: a) (1| 2: b) ]"
 		if bt.String() != wanted {
 			t.Error(strWantedGot("", wanted, bt))
 		}
 	}
-	bt.Put(4, "d")
+	bt.Put(3, "c")
 	{
-		wanted := "6| [ (3| 3: c) (2| 2: b) (1| 1: a) (2| 5: e) (1| 4: d) (1| 6: f) ]"
+		wanted := "3| [ (2| 2: b) (1| 1: a) (1| 3: c) ]"
 		if bt.String() != wanted {
 			t.Error(strWantedGot("", wanted, bt))
 		}

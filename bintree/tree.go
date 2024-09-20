@@ -111,7 +111,7 @@ func (bt *BinTree[Key, Value]) put(
 	default:
 		node.Value = val
 	}
-	if absInt(node.getBF()) > 1 {
+	if node.getBF()*node.getBF() > 1 {
 		node = bt.balance(node)
 	}
 	node.updateHeight()
@@ -226,13 +226,13 @@ func (bt *BinTree[Key, Value]) deleteAt(node *Node[Key, Value]) *Node[Key, Value
 }
 
 func (bt *BinTree[Key, Value]) balance(node *Node[Key, Value]) *Node[Key, Value] {
-	if node.Left == nil || node.Right.height > node.Left.height {
+	if node.getBF() > 0 {
 		if node.Right.getBF() < 0 {
 			node.Right = node.Right.rightRotation()
 		}
 		return node.leftRotation()
 	}
-	if node.Right == nil || node.Left.height > node.Right.height {
+	if node.getBF() < 0 {
 		if node.Left.getBF() > 0 {
 			node.Left = node.Left.leftRotation()
 		}
@@ -251,11 +251,4 @@ func (n *Node[Key, Value]) getBF() int {
 		rightHeight = n.Right.height
 	}
 	return rightHeight - leftHeight
-}
-
-func absInt(a int) int {
-	if a < 0 {
-		return -a
-	}
-	return a
 }
