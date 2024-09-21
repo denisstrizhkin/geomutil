@@ -88,23 +88,23 @@ func (bt *BinTree[Key, Value]) Put(key Key, val Value) {
 	bt.head = bt.head.put(key, val, bt.cmp)
 }
 
-func (node *Node[Key, Value]) put(
+func (n *Node[Key, Value]) put(
 	key Key, val Value, cmp Comparator[Key],
 ) *Node[Key, Value] {
-	if node == nil {
+	if n == nil {
 		return NewNode(key, val)
 	}
-	c := cmp(node.Key, key)
+	c := cmp(n.Key, key)
 	switch {
 	case c > 0:
-		node.Left = node.Left.put(key, val, cmp)
+		n.Left = n.Left.put(key, val, cmp)
 	case c < 0:
-		node.Right = node.Right.put(key, val, cmp)
+		n.Right = n.Right.put(key, val, cmp)
 	default:
-		node.Value = val
+		n.Value = val
 	}
-	node.updateHeight()
-	return node.balance()
+	n.updateHeight()
+	return n.balance()
 }
 
 func (n *Node[Key, Value]) updateHeight() {
@@ -117,19 +117,19 @@ func (bt *BinTree[Key, Value]) Get(key Key) (Value, bool) {
 	return bt.head.get(key, bt.cmp)
 }
 
-func (node *Node[Key, Value]) get(key Key, cmp Comparator[Key]) (Value, bool) {
-	if node == nil {
+func (n *Node[Key, Value]) get(key Key, cmp Comparator[Key]) (Value, bool) {
+	if n == nil {
 		var zero Value
 		return zero, false
 	}
-	c := cmp(node.Key, key)
+	c := cmp(n.Key, key)
 	switch {
 	case c > 0:
-		return node.Left.get(key, cmp)
+		return n.Left.get(key, cmp)
 	case c < 0:
-		return node.Right.get(key, cmp)
+		return n.Right.get(key, cmp)
 	default:
-		return node.Value, true
+		return n.Value, true
 	}
 }
 
@@ -139,66 +139,66 @@ type TraversalActionNode[Key, Value any] func(*Node[Key, Value])
 func (bt *BinTree[Key, Value]) PreOrderTraversal(
 	ta TraversalAction[Key, Value],
 ) {
-	bt.preOrderTraversal(bt.head, ta)
+	bt.head.preOrderTraversal(ta)
 }
 
-func (bt *BinTree[Key, Value]) preOrderTraversal(
-	node *Node[Key, Value], ta TraversalAction[Key, Value],
+func (n *Node[Key, Value]) preOrderTraversal(
+	ta TraversalAction[Key, Value],
 ) {
-	if node == nil {
+	if n == nil {
 		return
 	}
-	ta(node.Key, node.Value)
-	bt.preOrderTraversal(node.Left, ta)
-	bt.preOrderTraversal(node.Right, ta)
+	ta(n.Key, n.Value)
+	n.Left.preOrderTraversal(ta)
+	n.Left.preOrderTraversal(ta)
 }
 
 func (bt *BinTree[Key, Value]) PreOrderTraversalNode(
 	ta TraversalActionNode[Key, Value],
 ) {
-	bt.preOrderTraversalNode(bt.head, ta)
+	bt.head.preOrderTraversalNode(ta)
 }
 
-func (bt *BinTree[Key, Value]) preOrderTraversalNode(
-	node *Node[Key, Value], ta TraversalActionNode[Key, Value],
+func (n *Node[Key, Value]) preOrderTraversalNode(
+	ta TraversalActionNode[Key, Value],
 ) {
-	if node == nil {
+	if n == nil {
 		return
 	}
-	ta(node)
-	bt.preOrderTraversalNode(node.Left, ta)
-	bt.preOrderTraversalNode(node.Right, ta)
+	ta(n)
+	n.Left.preOrderTraversalNode(ta)
+	n.Right.preOrderTraversalNode(ta)
 }
 
 func (bt *BinTree[Key, Value]) Delete(key Key) {
 	bt.head = bt.head.delete(key, bt.cmp)
 }
 
-func (node *Node[Key, Value]) delete(key Key, cmp Comparator[Key]) *Node[Key, Value] {
-	if node == nil {
+func (n *Node[Key, Value]) delete(key Key, cmp Comparator[Key]) *Node[Key, Value] {
+	if n == nil {
 		return nil
 	}
-	c := cmp(node.Key, key)
+	c := cmp(n.Key, key)
 	switch {
 	case c > 0:
-		node.Left = node.Left.delete(key, cmp)
+		n.Left = n.Left.delete(key, cmp)
 	case c < 0:
-		node.Right = node.Right.delete(key, cmp)
+		n.Right = n.Right.delete(key, cmp)
 	default:
 		switch {
-		case node.Left == nil:
-			node = node.Right
-		case node.Right == nil:
-			node = node.Left
+		case n.Left == nil:
+			n = n.Right
+		case n.Right == nil:
+			n = n.Left
 		default:
-			nodeMin := node.Right.minNode()
-			node.Value = nodeMin.Value
-			node.Key = nodeMin.Key
-			node.Right = node.Right.delete(nodeMin.Key, cmp)
+			nodeMin := n.Right.minNode()
+			n.Value = nodeMin.Value
+			n.Key = nodeMin.Key
+			n.Right = n.Right.delete(nodeMin.Key, cmp)
 		}
 	}
-	node.updateHeight()
-	return node.balance()
+	n.updateHeight()
+	return n.balance()
 }
 
 func (n *Node[Key, Value]) balance() *Node[Key, Value] {
