@@ -63,7 +63,7 @@ func (n *Node[Key, Value]) minNode() *Node[Key, Value] {
 	if n.Left == nil {
 		return n
 	}
-	return n.minNode()
+	return n.Left.minNode()
 }
 
 func (n *Node[Key, Value]) leftRotation() *Node[Key, Value] {
@@ -85,28 +85,28 @@ func (n *Node[Key, Value]) rightRotation() *Node[Key, Value] {
 }
 
 func (bt *BinTree[Key, Value]) Put(key Key, val Value) {
-	bt.head = bt.put(bt.head, key, val)
+	bt.head = bt.head.put(key, val, bt.cmp)
 }
 
-func (bt *BinTree[Key, Value]) put(
-	node *Node[Key, Value], key Key, val Value,
+func (node *Node[Key, Value]) put(
+	key Key, val Value, cmp Comparator[Key],
 ) *Node[Key, Value] {
 	if node == nil {
 		return NewNode(key, val)
 	}
-	cmp := bt.cmp(node.Key, key)
+	c := cmp(node.Key, key)
 	switch {
-	case cmp > 0:
-		node.Left = bt.put(node.Left, key, val)
-	case cmp < 0:
-		node.Right = bt.put(node.Right, key, val)
+	case c > 0:
+		node.Left = node.Left.put(key, val, cmp)
+	case c < 0:
+		node.Right = node.Right.put(key, val, cmp)
 	default:
 		node.Value = val
 	}
+	node.updateHeight()
 	if node.getBF()*node.getBF() > 1 {
 		node = node.balance()
 	}
-	node.updateHeight()
 	return node
 }
 
@@ -117,20 +117,20 @@ func (n *Node[Key, Value]) updateHeight() {
 }
 
 func (bt *BinTree[Key, Value]) Get(key Key) (Value, bool) {
-	return bt.get(bt.head, key)
+	return bt.head.get(key, bt.cmp)
 }
 
-func (bt *BinTree[Key, Value]) get(node *Node[Key, Value], key Key) (Value, bool) {
+func (node *Node[Key, Value]) get(key Key, cmp Comparator[Key]) (Value, bool) {
 	if node == nil {
 		var zero Value
 		return zero, false
 	}
-	cmp := bt.cmp(node.Key, key)
+	c := cmp(node.Key, key)
 	switch {
-	case cmp > 0:
-		return bt.get(node.Left, key)
-	case cmp < 0:
-		return bt.get(node.Right, key)
+	case c > 0:
+		return node.Left.get(key, cmp)
+	case c < 0:
+		return node.Right.get(key, cmp)
 	default:
 		return node.Value, true
 	}
@@ -200,10 +200,10 @@ func (node *Node[Key, Value]) delete(key Key, cmp Comparator[Key]) *Node[Key, Va
 			node.Right = node.Right.delete(nodeMin.Key, cmp)
 		}
 	}
+	node.updateHeight()
 	if node.getBF()*node.getBF() > 1 {
 		node = node.balance()
 	}
-	node.updateHeight()
 	return node
 }
 

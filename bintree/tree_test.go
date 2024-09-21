@@ -264,3 +264,38 @@ func TestTestBalanceRightLeft(t *testing.T) {
 		}
 	}
 }
+
+func TestBalanceDelete(t *testing.T) {
+	// bt := NewBinTree[int, int](cmpInt)
+	// bt.Put(6, 6)
+	// bt.Put(3, 3)
+	// bt.Put(8, 8)
+	// bt.Put(7, 7)
+	// bt.Put(1, 1)
+	// bt.Put(2, 2)
+	// bt.Put(4, 4)
+	// bt.Delete(7)
+	// wanted := "[ (3| 3: 3) (2| 2: 2) (1| 1: 1) (2| 6: 6) (1| 4: 4) (1| 8: 8) ]"
+	// if bt.String() != wanted {
+	// 	t.Error(strWantedGot("", wanted, bt))
+	// }
+
+	bt := NewBinTree[int, int](cmpInt)
+	bt.Put(6, 6)
+	bt.Put(3, 3)
+	bt.Put(8, 8)
+	bt.Put(7, 7)
+	{
+		wanted := "[ (3| 6: 6) (1| 3: 3) (2| 8: 8) (1| 7: 7) ]"
+		if bt.String() != wanted {
+			t.Error(strWantedGot("", wanted, bt))
+		}
+	}
+	bt.Delete(6)
+	{
+		wanted := "[ (2| 7: 7) (1| 3: 3) (1| 8: 8) ]"
+		if bt.String() != wanted {
+			t.Error(strWantedGot("", wanted, bt))
+		}
+	}
+}
