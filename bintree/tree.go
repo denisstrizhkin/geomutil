@@ -104,10 +104,7 @@ func (node *Node[Key, Value]) put(
 		node.Value = val
 	}
 	node.updateHeight()
-	if node.getBF()*node.getBF() > 1 {
-		node = node.balance()
-	}
-	return node
+	return node.balance()
 }
 
 func (n *Node[Key, Value]) updateHeight() {
@@ -201,20 +198,18 @@ func (node *Node[Key, Value]) delete(key Key, cmp Comparator[Key]) *Node[Key, Va
 		}
 	}
 	node.updateHeight()
-	if node.getBF()*node.getBF() > 1 {
-		node = node.balance()
-	}
-	return node
+	return node.balance()
 }
 
 func (n *Node[Key, Value]) balance() *Node[Key, Value] {
-	if n.getBF() > 0 {
+	bf := n.getBF()
+	if bf > 1 {
 		if n.Right.getBF() < 0 {
 			n.Right = n.Right.rightRotation()
 		}
 		return n.leftRotation()
 	}
-	if n.getBF() < 0 {
+	if bf < -1 {
 		if n.Left.getBF() > 0 {
 			n.Left = n.Left.leftRotation()
 		}
