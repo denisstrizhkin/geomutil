@@ -4,10 +4,6 @@ type Triangle struct {
 	A, B, C Point
 }
 
-type Edge struct {
-	A, B Point
-}
-
 type CDT struct {
 	triangles *Stack[Triangle]
 }

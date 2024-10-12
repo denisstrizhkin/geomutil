@@ -13,6 +13,18 @@ type Point struct {
 	X, Y float64
 }
 
+type Edge struct {
+	A, B Point
+}
+
+func NewEdge(a, b Point) *Edge {
+	if a.Y > b.Y {
+		return &Edge{A: a, B: b}
+	} else {
+		return &Edge{A: b, B: a}
+	}
+}
+
 func (p Point) Scale(a float64) Point {
 	return Point{p.X * a, p.Y * a}
 }
