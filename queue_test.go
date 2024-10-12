@@ -11,11 +11,11 @@ func strWantedGot(msg string, wanted, got any) string {
 
 func TestPut(t *testing.T) {
 	eq := NewEventQueue[int]()
-	eq.Put(1)
-	eq.Put(2)
-	eq.Put(3)
-	eq.Put(4)
-	eq.Put(5)
+	eq.Enqueue(1)
+	eq.Enqueue(2)
+	eq.Enqueue(3)
+	eq.Enqueue(4)
+	eq.Enqueue(5)
 	wanted := "[1 2 3 4 5]"
 	if eq.String() != wanted {
 		t.Error(strWantedGot("", wanted, eq))
@@ -24,27 +24,27 @@ func TestPut(t *testing.T) {
 
 func TestPick(t *testing.T) {
 	eq := NewEventQueue[int]()
-	eq.Put(1)
-	eq.Put(2)
-	eq.Put(3)
-	eq.Put(4)
-	eq.Put(5)
+	eq.Enqueue(1)
+	eq.Enqueue(2)
+	eq.Enqueue(3)
+	eq.Enqueue(4)
+	eq.Enqueue(5)
 	wanted := "5"
-	if fmt.Sprint(eq.Pick()) != wanted {
-		t.Error(strWantedGot("", wanted, fmt.Sprint(eq.Pick())))
+	if fmt.Sprint(eq.Peek()) != wanted {
+		t.Error(strWantedGot("", wanted, fmt.Sprint(eq.Peek())))
 	}
 }
 
 func TestPop(t *testing.T) {
 	eq := NewEventQueue[int]()
-	eq.Put(1)
-	eq.Put(2)
-	eq.Put(3)
-	eq.Put(4)
-	eq.Put(5)
+	eq.Enqueue(1)
+	eq.Enqueue(2)
+	eq.Enqueue(3)
+	eq.Enqueue(4)
+	eq.Enqueue(5)
 	wanted := "5"
-	if fmt.Sprint(eq.Pop()) != wanted {
-		t.Error(strWantedGot("", wanted, fmt.Sprint(eq.Pop())))
+	if fmt.Sprint(eq.Dequeue()) != wanted {
+		t.Error(strWantedGot("", wanted, fmt.Sprint(eq.Dequeue())))
 	}
 	wanted = "[1 2 3 4]"
 	if eq.String() != wanted {

@@ -12,16 +12,24 @@ func NewEventQueue[T any]() *EventQueue[T] {
 	return &EventQueue[T]{items: make([]T, 0)}
 }
 
-func (eq *EventQueue[T]) Put(item T) {
+func (eq *EventQueue[T]) Enqueue(item T) {
 	eq.items = append(eq.items, item)
 }
 
-func (eq *EventQueue[T]) Pick() T {
-	return eq.items[len(eq.items)-1]
+func (eq *EventQueue[T]) Peek() (T, bool) {
+	if len(eq.items) == 0 {
+		var zero T
+		return zero, false
+	}
+	return eq.items[len(eq.items)-1], true
 }
 
-func (eq *EventQueue[T]) Pop() T {
-	item := eq.Pick()
+func (eq *EventQueue[T]) Dequeue() (T, bool) {
+	if len(eq.items) == 0 {
+		var zero T
+		return zero, false
+	}
+	item := eq.Peek()
 	eq.items = eq.items[:len(eq.items)-1]
 	return item
 }
