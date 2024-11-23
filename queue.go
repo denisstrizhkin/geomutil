@@ -29,9 +29,9 @@ func (eq *EventQueue[T]) Dequeue() (T, bool) {
 		var zero T
 		return zero, false
 	}
-	item := eq.Peek()
+	item, _ := eq.Peek()
 	eq.items = eq.items[:len(eq.items)-1]
-	return item
+	return item, true
 }
 
 func (eq *EventQueue[T]) String() string {
