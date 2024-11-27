@@ -1,45 +1,31 @@
 package main
 
 import (
-	"math"
-
 	triangulation "github.com/denisstrizhkin/geomutil/triangulation"
 	util "github.com/denisstrizhkin/geomutil/util"
+
+	rg "github.com/gen2brain/raylib-go/raygui"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 const (
-	ZOOM_SPEED    = 20
+	ZOOM_SPEED    = 100
 	MOUSE_SENS    = 100
 	WINDOW_WIDTH  = 800
 	WINDOW_HEIGHT = 450
 )
 
-func pointToVector2(p util.Point2D) rl.Vector2 {
+func point2DToVector2(p util.Point2D) rl.Vector2 {
 	return rl.NewVector2(p.X, -p.Y)
 }
 
 func getDefaultZoom(points []util.Point2D) float32 {
-	xMax := math.Inf(-1)
-	yMax := math.Inf(-1)
-	center := util.Point2DAvg(points)
-	for _, p := range points {
-		d := p.Subtract(center)
-		x := math.Abs(float64(d.X))
-		y := math.Abs(float64(d.Y))
-		if x > xMax {
-			xMax = x
-		}
-		if y > yMax {
-			yMax = y
-		}
-	}
-	zoomX := float32(float64(WINDOW_WIDTH) / 2.0 / xMax * 0.95)
-	zoomY := float32(float64(WINDOW_HEIGHT) / 2.0 / yMax * 0.95)
-	if zoomX < zoomY {
-		return zoomX
-	}
-	return zoomY
+	pMin := util.Point2DMin(points)
+	pMax := util.Point2DMax(points)
+	d := pMax.Subtract(pMin)
+	zoomX := float32(rl.GetScreenWidth()) / d.X * 0.95
+	zoomY := float32(rl.GetScreenHeight()) / d.Y * 0.95
+	return min(zoomX, zoomY)
 }
 
 func updateCamera(c *rl.Camera2D) {
@@ -54,7 +40,7 @@ func updateCamera(c *rl.Camera2D) {
 
 func plotPoints(points []util.Point2D, radius float32, color rl.Color) {
 	for _, p := range points {
-		rl.DrawCircleV(pointToVector2(p), radius, color)
+		rl.DrawCircleV(rl.Vector2AddValue(point2DToVector2(p), radius), radius, color)
 	}
 }
 
@@ -63,9 +49,9 @@ func plotPolygon(points []util.Point2D, width float32, color rl.Color) {
 	rl.DrawRenderBatchActive()
 	rl.SetLineWidth(width)
 	for i := 1; i < len(points); i++ {
-		rl.DrawLineV(pointToVector2(points[i-1]), pointToVector2(points[i]), color)
+		rl.DrawLineV(point2DToVector2(points[i-1]), point2DToVector2(points[i]), color)
 	}
-	rl.DrawLineV(pointToVector2(points[0]), pointToVector2(points[len(points)-1]), color)
+	rl.DrawLineV(point2DToVector2(points[0]), point2DToVector2(points[len(points)-1]), color)
 	rl.DrawRenderBatchActive()
 	rl.SetLineWidth(prevWidth)
 }
@@ -85,14 +71,16 @@ func main() {
 	}
 	triangulation := triangulation.NewTriangulation2D(points)
 
-	pointsCenter := util.Point2DAvg(points)
-	cameraTarget := pointToVector2(pointsCenter)
-	cameraOffset := rl.NewVector2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2)
-	cameraZoom := getDefaultZoom(points)
-	camera := rl.NewCamera2D(cameraOffset, cameraTarget, 0, cameraZoom)
-
 	rl.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "geomutil test")
 	defer rl.CloseWindow()
+
+	pointsCenter := util.Point2DAvg(points)
+	cameraTarget := point2DToVector2(pointsCenter)
+	cameraOffset := rl.NewVector2(float32(rl.GetScreenWidth())/2.0, float32(rl.GetScreenHeight())/2.0)
+	camera := rl.NewCamera2D(cameraOffset, cameraTarget, 0, getDefaultZoom(points))
+	btn := rl.NewRectangle(10, 10, 500, 200)
+	btn_clck := false
+
 	rl.SetTargetFPS(60)
 	for !rl.WindowShouldClose() {
 		updateCamera(&camera)
@@ -101,9 +89,18 @@ func main() {
 		rl.BeginMode2D(camera)
 
 		rl.ClearBackground(rl.RayWhite)
+		if rl.IsKeyPressed(rl.KeyRight) {
+			triangulation.Step()
+		}
+
 		plotPoints(points, 0.1, rl.Yellow)
 		triangles := triangulation.Triangles()
 		plotTriangles(triangles, 0.05, rl.Green)
+		rl.EndMode2D()
+		btn_clck = rg.Button(btn, "Click me!")
+		if btn_clck {
+			rl.DrawText("Nippah!", WINDOW_WIDTH/2, WINDOW_HEIGHT/2, 100, rl.Black)
+		}
 
 		rl.EndDrawing()
 	}
