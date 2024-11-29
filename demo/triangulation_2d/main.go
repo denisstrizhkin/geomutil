@@ -40,7 +40,8 @@ func updateCamera(c *rl.Camera2D) {
 
 func plotPoints(points []util.Point2D, radius float32, color rl.Color) {
 	for _, p := range points {
-		rl.DrawCircleV(rl.Vector2AddValue(point2DToVector2(p), radius), radius, color)
+		rl.DrawCircleV(point2DToVector2(p), radius, color)
+		rl.DrawPixelV(point2DToVector2(p), rl.Black)
 	}
 }
 
@@ -78,28 +79,27 @@ func main() {
 	cameraTarget := point2DToVector2(pointsCenter)
 	cameraOffset := rl.NewVector2(float32(rl.GetScreenWidth())/2.0, float32(rl.GetScreenHeight())/2.0)
 	camera := rl.NewCamera2D(cameraOffset, cameraTarget, 0, getDefaultZoom(points))
-	btn := rl.NewRectangle(10, 10, 500, 200)
-	btn_clck := false
+	btn := rl.NewRectangle(float32(rl.GetScreenWidth())-60, float32(rl.GetScreenHeight())-30, 60, 30)
 
 	rl.SetTargetFPS(60)
 	for !rl.WindowShouldClose() {
 		updateCamera(&camera)
 
 		rl.BeginDrawing()
+		rl.ClearBackground(rl.RayWhite)
+
 		rl.BeginMode2D(camera)
 
-		rl.ClearBackground(rl.RayWhite)
-		if rl.IsKeyPressed(rl.KeyRight) {
-			triangulation.Step()
-		}
-
-		plotPoints(points, 0.1, rl.Yellow)
+		plotPoints(points, 0.2, rl.Yellow)
+		plotPolygon(points, 2, rl.Black)
 		triangles := triangulation.Triangles()
 		plotTriangles(triangles, 0.05, rl.Green)
+
 		rl.EndMode2D()
-		btn_clck = rg.Button(btn, "Click me!")
-		if btn_clck {
-			rl.DrawText("Nippah!", WINDOW_WIDTH/2, WINDOW_HEIGHT/2, 100, rl.Black)
+
+		btn_clck := rg.Button(btn, "Next")
+		if btn_clck || rl.IsKeyPressed(rl.KeyN) {
+			triangulation.Step()
 		}
 
 		rl.EndDrawing()
