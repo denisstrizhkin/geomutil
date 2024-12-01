@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	triangulation "github.com/denisstrizhkin/geomutil/triangulation"
 	util "github.com/denisstrizhkin/geomutil/util"
 
@@ -19,13 +21,14 @@ func point2DToVector2(p util.Point2D) rl.Vector2 {
 	return rl.NewVector2(p.X, -p.Y)
 }
 
-func getDefaultZoom(points []util.Point2D) float32 {
-	pMin := util.Point2DMin(points)
+func getDefaultZoom(points []util.Point2D) (rl.Vector2, float32) {
 	pMax := util.Point2DMax(points)
+	pMin := util.Point2DMin(points)
 	d := pMax.Subtract(pMin)
-	zoomX := float32(rl.GetScreenWidth()) / d.X * 0.95
-	zoomY := float32(rl.GetScreenHeight()) / d.Y * 0.95
-	return min(zoomX, zoomY)
+	center := pMin.Add(pMax).Scale(0.5)
+	zoomX := float32(WINDOW_WIDTH) / d.X * 0.95
+	zoomY := float32(WINDOW_HEIGHT) / d.Y * 0.95
+	return point2DToVector2(center), min(zoomX, zoomY)
 }
 
 func updateCamera(c *rl.Camera2D) {
@@ -38,10 +41,10 @@ func updateCamera(c *rl.Camera2D) {
 	c.Zoom += dt * ZOOM_SPEED * rl.GetMouseWheelMove()
 }
 
-func plotPoints(points []util.Point2D, radius float32, color rl.Color) {
+func plotPoints(points []util.Point2D, radius float32, zoom float32, color rl.Color) {
+	radius = radius / zoom
 	for _, p := range points {
-		rl.DrawCircleV(point2DToVector2(p), radius, color)
-		rl.DrawPixelV(point2DToVector2(p), rl.Black)
+		rl.DrawCircleV(rl.Vector2AddValue(point2DToVector2(p), 0.5), radius, color)
 	}
 }
 
@@ -75,10 +78,10 @@ func main() {
 	rl.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "geomutil test")
 	defer rl.CloseWindow()
 
-	pointsCenter := util.Point2DAvg(points)
-	cameraTarget := point2DToVector2(pointsCenter)
-	cameraOffset := rl.NewVector2(float32(rl.GetScreenWidth())/2.0, float32(rl.GetScreenHeight())/2.0)
-	camera := rl.NewCamera2D(cameraOffset, cameraTarget, 0, getDefaultZoom(points))
+	cameraTarget, cameraZoom := getDefaultZoom(points)
+	log.Println(cameraTarget, cameraZoom)
+	cameraOffset := rl.NewVector2(300, 125)
+	camera := rl.NewCamera2D(cameraOffset, cameraTarget, 0, cameraZoom)
 	btn := rl.NewRectangle(float32(rl.GetScreenWidth())-60, float32(rl.GetScreenHeight())-30, 60, 30)
 
 	rl.SetTargetFPS(60)
@@ -90,11 +93,11 @@ func main() {
 
 		rl.BeginMode2D(camera)
 
-		plotPoints(points, 0.2, rl.Yellow)
-		plotPolygon(points, 2, rl.Black)
 		triangles := triangulation.Triangles()
-		plotTriangles(triangles, 0.05, rl.Green)
+		plotTriangles(triangles, 2, rl.Green)
+		plotPoints(points, 5, camera.Zoom, rl.Black)
 
+		rl.DrawCircleV(rl.Vector2AddValue(cameraTarget, 0.5), 0.1, rl.Gray)
 		rl.EndMode2D()
 
 		btn_clck := rg.Button(btn, "Next")
