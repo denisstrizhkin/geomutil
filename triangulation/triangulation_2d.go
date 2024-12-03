@@ -1,18 +1,18 @@
 package triangulation
 
 import (
-	util "github.com/denisstrizhkin/geomutil/util"
+	u "github.com/denisstrizhkin/geomutil/util"
 	"math"
 	"slices"
 )
 
 type Triangle2D struct {
-	A util.Point2D
-	B util.Point2D
-	C util.Point2D
+	A u.Point2D
+	B u.Point2D
+	C u.Point2D
 }
 
-func (t *Triangle2D) isInsideCircumcircle(p util.Point2D) bool {
+func (t *Triangle2D) isInsideCircumcircle(p u.Point2D) bool {
 	det := t.A.X*(t.B.Y*t.B.X*t.B.X+t.C.Y*t.C.X*t.C.X+p.Y*p.X*p.X) -
 		t.A.Y*(t.B.X*t.B.X+t.C.X*t.C.X+p.X*p.X) +
 		(t.B.X*t.B.Y*t.B.X + t.C.X*t.C.Y*t.C.X + p.X*p.Y) -
@@ -20,25 +20,29 @@ func (t *Triangle2D) isInsideCircumcircle(p util.Point2D) bool {
 	return det > 0
 }
 
-func (t *Triangle2D) Edges() [3]Edge2D {
-	return [3]Edge2D{{t.A, t.B}, {t.B, t.C}, {t.C, t.A}}
+func (t *Triangle2D) Edges() [3]u.Edge2D {
+	return [3]u.Edge2D{
+		u.NewEdge2D(t.A, t.B),
+		u.NewEdge2D(t.B, t.C),
+		u.NewEdge2D(t.C, t.A),
+	}
 }
 
-func (t *Triangle2D) hasEdge(e Edge2D) bool {
-	return e == Edge2D{t.A, t.B} || e == Edge2D{t.B, t.C} || e == Edge2D{t.C, t.A}
-}
-
-type Edge2D struct {
-	A util.Point2D
-	B util.Point2D
+func (t *Triangle2D) hasEdge(e u.Edge2D) bool {
+	for _, edge := range t.Edges() {
+		if e == edge {
+			return true
+		}
+	}
+	return false
 }
 
 func degreesToRadians(deg float32) float32 {
 	return deg * math.Pi / 180.0
 }
 
-func getSuperTriangle(points []util.Point2D) Triangle2D {
-	center := util.Point2DAvg(points)
+func getSuperTriangle(points []u.Point2D) Triangle2D {
+	center := u.Point2DAvg(points)
 	radius := float32(math.Inf(-1))
 	for _, p := range points {
 		dist := center.Distance(p)
@@ -51,24 +55,24 @@ func getSuperTriangle(points []util.Point2D) Triangle2D {
 	half_median := radius / float32(math.Sin(rad))
 	half_side := radius / float32(math.Cos(rad))
 	return Triangle2D{
-		util.NewPoint2D(center.X-half_side, center.Y-radius),
-		util.NewPoint2D(center.X+half_side, center.Y-radius),
-		util.NewPoint2D(center.X, center.Y+half_median),
+		u.NewPoint2D(center.X-half_side, center.Y-radius),
+		u.NewPoint2D(center.X+half_side, center.Y-radius),
+		u.NewPoint2D(center.X, center.Y+half_median),
 	}
 }
 
 type Triangulation2D struct {
 	triangles   []Triangle2D
-	points      []util.Point2D
-	edge_points []util.Point2D
+	points      []u.Point2D
+	edge_points []u.Point2D
 }
 
-func NewTriangulation2D(points []util.Point2D) Triangulation2D {
+func NewTriangulation2D(points []u.Point2D) Triangulation2D {
 	superTriangle := getSuperTriangle(points)
 	return Triangulation2D{
 		triangles:   []Triangle2D{superTriangle},
 		points:      points,
-		edge_points: []util.Point2D{superTriangle.A, superTriangle.B, superTriangle.C},
+		edge_points: []u.Point2D{superTriangle.A, superTriangle.B, superTriangle.C},
 	}
 }
 
@@ -85,7 +89,7 @@ func (t *Triangulation2D) Step() {
 			badTriangles = append(badTriangles, triangle)
 		}
 	}
-	polygon := make([]Edge2D, 0)
+	polygon := make([]u.Edge2D, 0)
 	for _, triangle := range badTriangles {
 		for _, edge := range triangle.Edges() {
 			countShared := 0
