@@ -32,8 +32,16 @@ func (p Point2D) Add(q Point2D) Point2D {
 	return Point2D{p.X + q.X, p.Y + q.Y}
 }
 
+func (p Point2D) AddValue(a float32) Point2D {
+	return Point2D{p.X + a, p.Y + a}
+}
+
 func (p Point2D) Subtract(q Point2D) Point2D {
 	return Point2D{p.X - q.X, p.Y - q.Y}
+}
+
+func (p Point2D) SubtractValue(a float32) Point2D {
+	return Point2D{p.X - a, p.Y - a}
 }
 
 func (p Point2D) Multiply(q Point2D) Point2D {
