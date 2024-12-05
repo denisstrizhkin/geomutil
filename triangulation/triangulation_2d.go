@@ -37,7 +37,7 @@ func (t *Triangle2D) hasEdge(e u.Edge2D) bool {
 	return false
 }
 
-func degreesToRadians(deg float32) float32 {
+func DegreesToRadians(deg float32) float32 {
 	return deg * math.Pi / 180.0
 }
 

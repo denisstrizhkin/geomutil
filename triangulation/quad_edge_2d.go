@@ -118,3 +118,17 @@ func Server(e *QuarterEdge) {
 	Splice(e, e.Prev())
 	Splice(e.Sym(), e.Sym().Prev())
 }
+
+func InsertPoint(e *QuarterEdge, p u.Point2D) *QuarterEdge {
+	first_spoke := MakeQuadEdge(e.vertex, p)
+	Splice(first_spoke, e)
+	spoke := first_spoke
+	for {
+		spoke = Connect(e, spoke.Sym())
+		e = spoke.Prev()
+		if e.LNext() != first_spoke {
+			break
+		}
+	}
+	return first_spoke
+}
