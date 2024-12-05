@@ -18,6 +18,10 @@ type QuarterEdge struct {
 	vertex u.Point2D
 }
 
+func (q *QuarterEdge) Dest() u.Point2D {
+	return q.Sym().vertex
+}
+
 func (q *QuarterEdge) Rot() *QuarterEdge {
 	return q.current.refs[(q.current_index+1)%4]
 }
@@ -32,6 +36,14 @@ func (q *QuarterEdge) Tor() *QuarterEdge {
 
 func (q *QuarterEdge) Next() *QuarterEdge {
 	return q.next.refs[q.next_index]
+}
+
+func (q *QuarterEdge) LNext() *QuarterEdge {
+	return q.Tor().Next().Rot()
+}
+
+func (q *QuarterEdge) Prev() *QuarterEdge {
+	return q.Rot().Next().Rot()
 }
 
 func MakeQuadEdge(start u.Point2D, end u.Point2D) *QuarterEdge {
@@ -67,4 +79,42 @@ func MakeQuadEdge(start u.Point2D, end u.Point2D) *QuarterEdge {
 	left_right.next_index = 1
 
 	return start_end
+}
+
+func Splice(a *QuarterEdge, b *QuarterEdge) {
+	SwapNexts(a.Next().Rot(), b.Next().Rot())
+	SwapNexts(a, b)
+}
+
+func SwapNexts(a *QuarterEdge, b *QuarterEdge) {
+	anext := a.next
+	anext_index := a.next_index
+	a.next = b.next
+	a.next_index = b.next_index
+	b.next = anext
+	b.next_index = anext_index
+}
+
+func MakeTriangle(a u.Point2D, b u.Point2D, c u.Point2D) *QuarterEdge {
+	ab := MakeQuadEdge(a, b)
+	bc := MakeQuadEdge(b, c)
+	ca := MakeQuadEdge(c, a)
+
+	Splice(ab.Sym(), bc)
+	Splice(bc.Sym(), ca)
+	Splice(ca.Sym(), ab)
+
+	return ab
+}
+
+func Connect(a *QuarterEdge, b *QuarterEdge) *QuarterEdge {
+	new_edge := MakeQuadEdge(a.Dest(), b.vertex)
+	Splice(new_edge, a.LNext())
+	Splice(new_edge.Sym(), b)
+	return new_edge
+}
+
+func Server(e *QuarterEdge) {
+	Splice(e, e.Prev())
+	Splice(e.Sym(), e.Sym().Prev())
 }
