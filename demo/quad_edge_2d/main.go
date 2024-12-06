@@ -139,7 +139,7 @@ func main() {
 			e = e.Sym()
 		case rl.KeyS:
 		case rl.KeyDown:
-			e = e.Next()
+			e = e.ONext()
 		case rl.KeyA:
 		case rl.KeyLeft:
 			e = e.Tor()

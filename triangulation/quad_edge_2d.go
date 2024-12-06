@@ -17,10 +17,12 @@ type QuarterEdge struct {
 	vertex u.Point2D
 }
 
+// Origin vertex
 func (q *QuarterEdge) Orig() u.Point2D {
 	return q.vertex
 }
 
+// Destination vertex
 func (q *QuarterEdge) Dest() u.Point2D {
 	return q.Sym().vertex
 }
@@ -37,16 +39,24 @@ func (q *QuarterEdge) Tor() *QuarterEdge {
 	return q.current.refs[(q.current_index+3)%4]
 }
 
-func (q *QuarterEdge) Next() *QuarterEdge {
+// Next edge around the origin
+func (q *QuarterEdge) ONext() *QuarterEdge {
 	return q.next
 }
 
+// Next edge around the left face
 func (q *QuarterEdge) LNext() *QuarterEdge {
-	return q.Tor().Next().Rot()
+	return q.Tor().ONext().Rot()
 }
 
-func (q *QuarterEdge) Prev() *QuarterEdge {
-	return q.Rot().Next().Rot()
+// Next edge around the right face
+func (q *QuarterEdge) RNext() *QuarterEdge {
+	return q.Rot().ONext().Tor()
+}
+
+// Previous edge around the origin
+func (q *QuarterEdge) OPrev() *QuarterEdge {
+	return q.Rot().ONext().Rot()
 }
 
 func MakeQuadEdge(start u.Point2D, end u.Point2D) *QuarterEdge {
@@ -81,7 +91,7 @@ func MakeQuadEdge(start u.Point2D, end u.Point2D) *QuarterEdge {
 }
 
 func Splice(a *QuarterEdge, b *QuarterEdge) {
-	SwapNexts(a.Next().Rot(), b.Next().Rot())
+	SwapNexts(a.ONext().Rot(), b.ONext().Rot())
 	SwapNexts(a, b)
 }
 
@@ -109,8 +119,8 @@ func Connect(a *QuarterEdge, b *QuarterEdge) *QuarterEdge {
 }
 
 func Sever(e *QuarterEdge) {
-	Splice(e, e.Prev())
-	Splice(e.Sym(), e.Sym().Prev())
+	Splice(e, e.OPrev())
+	Splice(e.Sym(), e.Sym().OPrev())
 }
 
 func InsertPoint(e *QuarterEdge, p u.Point2D) *QuarterEdge {
@@ -119,7 +129,7 @@ func InsertPoint(e *QuarterEdge, p u.Point2D) *QuarterEdge {
 	spoke := first_spoke
 	for {
 		spoke = Connect(e, spoke.Sym())
-		e = spoke.Prev()
+		e = spoke.OPrev()
 		if e.LNext() != first_spoke {
 			break
 		}
