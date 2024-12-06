@@ -53,6 +53,27 @@ func (p Point2D) Distance(q Point2D) float32 {
 	return d.Length()
 }
 
+func (p Point2D) Rotate(angle float32) Point2D {
+	sina := float32(math.Sin(float64(angle)))
+	cosa := float32(math.Cos(float64(angle)))
+	return Point2D{
+		cosa*p.X - sina*p.Y, sina*p.X + cosa*p.Y,
+	}
+}
+
+func (p Point2D) Negative() Point2D {
+	return p.Scale(-1)
+}
+
+func (p Point2D) Normalize() Point2D {
+	len := p.Length()
+	if len > 0 {
+		p.X *= 1 / len
+		p.Y *= 1 / len
+	}
+	return p
+}
+
 func Point2DAvg(points []Point2D) Point2D {
 	avg := Point2D{}
 	for _, p := range points {

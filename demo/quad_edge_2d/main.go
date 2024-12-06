@@ -76,14 +76,40 @@ func plotTriangles(triangles []triangulation.Triangle2D, width float32, color rl
 	}
 }
 
+func drawQuarterEdge(e *triangulation.QuarterEdge, width float32, zoom float32, color rl.Color) {
+	prevWidth := rl.GetLineWidth()
+	rl.DrawRenderBatchActive()
+	rl.SetLineWidth(width)
+	orig := e.Orig()
+	dest := e.Dest()
+	direction := dest.Negative().Add(orig).Negative()
+	DrawLine(orig, dest, color)
+	a := direction.Rotate(triangulation.DegreesToRadians(210)).Normalize().Scale(20 / zoom)
+	a = dest.Add(a)
+	b := direction.Rotate(triangulation.DegreesToRadians(150)).Normalize().Scale(20 / zoom)
+	b = dest.Add(b)
+	DrawLine(dest, a, color)
+	DrawLine(dest, b, color)
+	rl.DrawRenderBatchActive()
+	rl.SetLineWidth(prevWidth)
+}
+
 func main() {
 	a1 := u.NewPoint2D(0, 0)
 	b1 := u.NewPoint2D(1, 0)
 	c1 := u.NewPoint2D(0.5, 0.5*float32(math.Tan(float64(triangulation.DegreesToRadians(60)))))
-	points := []u.Point2D{a1, b1, c1}
+	a2 := u.NewPoint2D(0.4, 0.5)
+	b2 := u.NewPoint2D(0.6, 0.5)
+	c2 := u.NewPoint2D(0.5, 0.5-0.1*float32(math.Tan(float64(triangulation.DegreesToRadians(60)))))
+	points := []u.Point2D{a1, b1, c1, a2, b2, c2}
 
-	e := triangulation.MakeQuadEdge(a1, b1)
-	triangulation.InsertPoint(e, c1)
+	t1 := triangulation.MakeTriangle(a1, b1, c1)
+	t2 := triangulation.MakeTriangle(a2, b2, c2)
+	triangulation.Connect(t1.Sym(), t2)
+	// triangulation.Connect(t1.Sym(), t2.Prev().Sym())
+	// triangulation.Connect(t1.Next(), t2)
+	// triangulation.Connect(t1.Next(), t2.Sym())
+	e := t1
 
 	rl.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "geomutil test")
 	defer rl.CloseWindow()
@@ -103,8 +129,24 @@ func main() {
 		rl.BeginMode2D(camera)
 
 		plotPoints(points, 5, camera.Zoom, rl.Black)
+		drawQuarterEdge(e, 3, camera.Zoom, rl.Red)
 
 		rl.EndMode2D()
+
+		switch rl.GetKeyPressed() {
+		case rl.KeyW:
+		case rl.KeyUp:
+			e = e.Sym()
+		case rl.KeyS:
+		case rl.KeyDown:
+			e = e.Next()
+		case rl.KeyA:
+		case rl.KeyLeft:
+			e = e.Tor()
+		case rl.KeyD:
+		case rl.KeyRight:
+			e = e.Rot()
+		}
 
 		// btn_clck := rg.Button(btn, "Next")
 		// if btn_clck || rl.IsKeyPressed(rl.KeyN) {

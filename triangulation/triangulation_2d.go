@@ -51,7 +51,7 @@ func getSuperTriangle(points []u.Point2D) Triangle2D {
 		}
 	}
 	radius += 1.0
-	rad := float64(degreesToRadians(30.0))
+	rad := float64(DegreesToRadians(30.0))
 	half_median := radius / float32(math.Sin(rad))
 	half_side := radius / float32(math.Cos(rad))
 	return Triangle2D{
