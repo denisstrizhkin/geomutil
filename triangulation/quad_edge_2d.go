@@ -44,6 +44,10 @@ func (q *QuarterEdge) ONext() *QuarterEdge {
 	return q.next
 }
 
+func (q *QuarterEdge) SetONext(e *QuarterEdge) {
+	q.next = e
+}
+
 // Next edge around the left face
 func (q *QuarterEdge) LNext() *QuarterEdge {
 	return q.Tor().ONext().Rot()

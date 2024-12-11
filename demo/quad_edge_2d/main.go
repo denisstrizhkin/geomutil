@@ -1,9 +1,10 @@
 package main
 
 import (
+	"log"
 	"math"
 
-	triangulation "github.com/denisstrizhkin/geomutil/triangulation"
+	tri "github.com/denisstrizhkin/geomutil/triangulation"
 	u "github.com/denisstrizhkin/geomutil/util"
 
 	// rg "github.com/gen2brain/raylib-go/raygui"
@@ -70,13 +71,13 @@ func plotPolygon(points []u.Point2D, width float32, color rl.Color) {
 	rl.SetLineWidth(prevWidth)
 }
 
-func plotTriangles(triangles []triangulation.Triangle2D, width float32, color rl.Color) {
+func plotTriangles(triangles []tri.Triangle2D, width float32, color rl.Color) {
 	for _, triangle := range triangles {
 		plotPolygon([]u.Point2D{triangle.A, triangle.B, triangle.C}, width, color)
 	}
 }
 
-func drawQuarterEdge(e *triangulation.QuarterEdge, width float32, zoom float32, color rl.Color) {
+func drawQuarterEdge(e *tri.QuarterEdge, width float32, zoom float32, color rl.Color) {
 	prevWidth := rl.GetLineWidth()
 	rl.DrawRenderBatchActive()
 	rl.SetLineWidth(width)
@@ -84,9 +85,9 @@ func drawQuarterEdge(e *triangulation.QuarterEdge, width float32, zoom float32, 
 	dest := e.Dest()
 	direction := dest.Negative().Add(orig).Negative()
 	DrawLine(orig, dest, color)
-	a := direction.Rotate(triangulation.DegreesToRadians(210)).Normalize().Scale(20 / zoom)
+	a := direction.Rotate(tri.DegreesToRadians(210)).Normalize().Scale(20 / zoom)
 	a = dest.Add(a)
-	b := direction.Rotate(triangulation.DegreesToRadians(150)).Normalize().Scale(20 / zoom)
+	b := direction.Rotate(tri.DegreesToRadians(150)).Normalize().Scale(20 / zoom)
 	b = dest.Add(b)
 	DrawLine(dest, a, color)
 	DrawLine(dest, b, color)
@@ -97,19 +98,30 @@ func drawQuarterEdge(e *triangulation.QuarterEdge, width float32, zoom float32, 
 func main() {
 	a1 := u.NewPoint2D(0, 0)
 	b1 := u.NewPoint2D(1, 0)
-	c1 := u.NewPoint2D(0.5, 0.5*float32(math.Tan(float64(triangulation.DegreesToRadians(60)))))
+	c1 := u.NewPoint2D(0.5, 0.5*float32(math.Tan(float64(tri.DegreesToRadians(60)))))
 	a2 := u.NewPoint2D(0.4, 0.5)
 	b2 := u.NewPoint2D(0.6, 0.5)
-	c2 := u.NewPoint2D(0.5, 0.5-0.1*float32(math.Tan(float64(triangulation.DegreesToRadians(60)))))
+	c2 := u.NewPoint2D(0.5, 0.5-0.1*float32(math.Tan(float64(tri.DegreesToRadians(60)))))
 	points := []u.Point2D{a1, b1, c1, a2, b2, c2}
 
-	t1 := triangulation.MakeTriangle(a1, b1, c1)
-	t2 := triangulation.MakeTriangle(a2, b2, c2)
-	triangulation.Connect(t1.Sym(), t2)
-	// triangulation.Connect(t1.Sym(), t2.Prev().Sym())
-	// triangulation.Connect(t1.Next(), t2)
-	// triangulation.Connect(t1.Next(), t2.Sym())
-	e := t1
+	a1b1 := tri.MakeTriangle(a1, b1, c1)
+	b1c1 := a1b1.LNext()
+	c1a1 := b1c1.LNext()
+	a2b2 := tri.MakeTriangle(a2, b2, c2)
+	c2a2 := a2b2.RNext()
+	b2c2 := c2a2.RNext()
+	a1a2 := tri.Connect(c1a1, a2b2)
+	a1c2 := tri.Connect(a1a2.Sym(), c2a2)
+	c1b2 := tri.Connect(b1c1, b2c2)
+	c1a2 := tri.Connect(c1b2.Sym(), a2b2)
+	b1c2 := tri.Connect(a1b1, c2a2)
+	b1b2 := tri.Connect(b1c2.Sym(), b2c2)
+	c2a2.SetONext(a1c2.Sym())
+	a1c2.Sym().SetONext(b1c2.Sym())
+	b1c2.Sym().SetONext(b2c2.Sym())
+
+	e := b1b2
+	log.Println(a1c2, b1b2, c1a2)
 
 	rl.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "geomutil test")
 	defer rl.CloseWindow()
