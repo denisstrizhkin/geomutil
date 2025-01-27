@@ -148,11 +148,11 @@ type Triangulation2D struct {
 	triangles []Triangle2D
 }
 
-func (t *Triangulation2D) GetPoints() []u.Point2D {
+func (t *Triangulation2D) Points() []u.Point2D {
 	return t.points
 }
 
-func (t *Triangulation2D) GetTriangles() []Triangle2D {
+func (t *Triangulation2D) Triangles() []Triangle2D {
 	return t.triangles
 }
 

@@ -74,6 +74,18 @@ func (p Point2D) Normalize() Point2D {
 	return p
 }
 
+func Point2DUnique(points []Point2D) []Point2D {
+	pMap := make(map[Point2D]bool, len(points))
+	unique := make([]Point2D, len(points))
+	for _, point := range points {
+		if !pMap[point] {
+			unique = append(unique, point)
+			pMap[point] = true
+		}
+	}
+	return unique
+}
+
 func Point2DAvg(points []Point2D) Point2D {
 	avg := Point2D{}
 	for _, p := range points {

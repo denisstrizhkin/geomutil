@@ -4,7 +4,7 @@ import (
 	triangulation "github.com/denisstrizhkin/geomutil/triangulation"
 	util "github.com/denisstrizhkin/geomutil/util"
 
-	rg "github.com/gen2brain/raylib-go/raygui"
+	// rg "github.com/gen2brain/raylib-go/raygui"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -81,7 +81,8 @@ func main() {
 		util.NewPoint2D(0.0, 1.0),
 		util.NewPoint2D(1.0, 1.0),
 	}
-	triangulation := triangulation.NewTriangulation2D(points)
+	triangulator, _ := triangulation.NewTriangulator2D(points)
+	triangulation := triangulator.Triangulate()
 
 	rl.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "geomutil test")
 	defer rl.CloseWindow()
@@ -89,7 +90,7 @@ func main() {
 	cameraTarget, cameraZoom := getDefaultZoom(points)
 	cameraOffset := rl.NewVector2(float32(rl.GetScreenWidth())/2, float32(rl.GetScreenHeight())/2)
 	camera := rl.NewCamera2D(cameraOffset, cameraTarget, 0, cameraZoom)
-	btn := rl.NewRectangle(float32(rl.GetScreenWidth())-60, float32(rl.GetScreenHeight())-30, 60, 30)
+	// btn := rl.NewRectangle(float32(rl.GetScreenWidth())-60, float32(rl.GetScreenHeight())-30, 60, 30)
 
 	rl.SetTargetFPS(60)
 	for !rl.WindowShouldClose() {
@@ -106,10 +107,10 @@ func main() {
 
 		rl.EndMode2D()
 
-		btn_clck := rg.Button(btn, "Next")
-		if btn_clck || rl.IsKeyPressed(rl.KeyN) {
-			triangulation.Step()
-		}
+		// btn_clck := rg.Button(btn, "Next")
+		// if btn_clck || rl.IsKeyPressed(rl.KeyN) {
+		// 	triangulation.Step()
+		// }
 
 		rl.EndDrawing()
 	}
