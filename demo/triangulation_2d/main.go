@@ -81,8 +81,7 @@ func main() {
 		util.NewPoint2D(0.0, 1.0),
 		util.NewPoint2D(1.0, 1.0),
 	}
-	triangulator, _ := triangulation.NewTriangulator2D(points)
-	triangulation := triangulator.Triangulate()
+	triangulation, _ := triangulation.NewTriangulation2D(points)
 
 	rl.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "geomutil test")
 	defer rl.CloseWindow()

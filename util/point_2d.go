@@ -1,9 +1,5 @@
 package util
 
-import (
-	"math"
-)
-
 type Point2D struct {
 	X, Y float32
 }
@@ -13,39 +9,39 @@ func NewPoint2D(X float32, Y float32) Point2D {
 }
 
 func (p Point2D) Length() float32 {
-	return float32(math.Sqrt(float64(p.X*p.X + p.Y*p.Y)))
+	return Sqrt(p.X*p.X + p.Y*p.Y)
 }
 
 func (p Point2D) Min(q Point2D) Point2D {
-	return Point2D{min(p.X, q.X), min(p.Y, q.Y)}
+	return NewPoint2D(min(p.X, q.X), min(p.Y, q.Y))
 }
 
 func (p Point2D) Max(q Point2D) Point2D {
-	return Point2D{max(p.X, q.X), max(p.Y, q.Y)}
+	return NewPoint2D(max(p.X, q.X), max(p.Y, q.Y))
 }
 
 func (p Point2D) Scale(a float32) Point2D {
-	return Point2D{p.X * a, p.Y * a}
+	return NewPoint2D(p.X*a, p.Y*a)
 }
 
 func (p Point2D) Add(q Point2D) Point2D {
-	return Point2D{p.X + q.X, p.Y + q.Y}
+	return NewPoint2D(p.X+q.X, p.Y+q.Y)
 }
 
 func (p Point2D) AddValue(a float32) Point2D {
-	return Point2D{p.X + a, p.Y + a}
+	return NewPoint2D(p.X+a, p.Y+a)
 }
 
 func (p Point2D) Subtract(q Point2D) Point2D {
-	return Point2D{p.X - q.X, p.Y - q.Y}
+	return NewPoint2D(p.X-q.X, p.Y-q.Y)
 }
 
 func (p Point2D) SubtractValue(a float32) Point2D {
-	return Point2D{p.X - a, p.Y - a}
+	return NewPoint2D(p.X-a, p.Y-a)
 }
 
 func (p Point2D) Multiply(q Point2D) Point2D {
-	return Point2D{p.X * q.Y, p.X * q.Y}
+	return NewPoint2D(p.X*q.Y, p.X*q.Y)
 }
 
 func (p Point2D) Distance(q Point2D) float32 {
@@ -53,12 +49,17 @@ func (p Point2D) Distance(q Point2D) float32 {
 	return d.Length()
 }
 
+func (p Point2D) DistanceSquared(q Point2D) float32 {
+	d := p.Subtract(q)
+	return d.X*d.X + d.Y*d.Y
+}
+
 func (p Point2D) Rotate(angle float32) Point2D {
-	sina := float32(math.Sin(float64(angle)))
-	cosa := float32(math.Cos(float64(angle)))
-	return Point2D{
-		cosa*p.X - sina*p.Y, sina*p.X + cosa*p.Y,
-	}
+	sina := Sin(angle)
+	cosa := Cos(angle)
+	return NewPoint2D(
+		cosa*p.X-sina*p.Y, sina*p.X+cosa*p.Y,
+	)
 }
 
 func (p Point2D) Negative() Point2D {
@@ -68,8 +69,7 @@ func (p Point2D) Negative() Point2D {
 func (p Point2D) Normalize() Point2D {
 	len := p.Length()
 	if len > 0 {
-		p.X *= 1 / len
-		p.Y *= 1 / len
+		return p.Scale(1 / len)
 	}
 	return p
 }
@@ -95,7 +95,7 @@ func Point2DAvg(points []Point2D) Point2D {
 }
 
 func Point2DMin(points []Point2D) Point2D {
-	pMin := Point2D{float32(math.Inf(1)), float32(math.Inf(1))}
+	pMin := NewPoint2D(Inf(1), Inf(1))
 	for _, p := range points {
 		pMin = pMin.Min(p)
 	}
@@ -103,7 +103,7 @@ func Point2DMin(points []Point2D) Point2D {
 }
 
 func Point2DMax(points []Point2D) Point2D {
-	pMax := Point2D{float32(math.Inf(-1)), float32(math.Inf(-1))}
+	pMax := NewPoint2D(Inf(-1), Inf(-1))
 	for _, p := range points {
 		pMax = pMax.Max(p)
 	}
