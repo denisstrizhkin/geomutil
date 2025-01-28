@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	demo "github.com/denisstrizhkin/geomutil/demo"
 	triangulation "github.com/denisstrizhkin/geomutil/triangulation"
 	util "github.com/denisstrizhkin/geomutil/util"
@@ -27,8 +29,12 @@ func main() {
 
 	d := demo.NewDemo(WINDOW_WIDTH, WINDOW_HEIGHT, "Triangulation 2D")
 	defer d.Close()
+	d.SetMouseSens(MOUSE_SENS)
+	d.SetZoomSpeed(ZOOM_SPEED)
 
 	cameraTarget, cameraZoom := demo.GetDefaultZoom(points)
+	log.Println("target", cameraTarget)
+	log.Println("zoom", cameraZoom)
 	camera := d.Camera()
 	camera.Target = cameraTarget
 	camera.Zoom = cameraZoom

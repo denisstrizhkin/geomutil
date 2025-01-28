@@ -1,6 +1,8 @@
 package demo
 
 import (
+	"log"
+
 	u "github.com/denisstrizhkin/geomutil/util"
 
 	tri "github.com/denisstrizhkin/geomutil/triangulation"
@@ -51,6 +53,14 @@ func (d *Demo) Camera() *rl.Camera2D {
 	return &d.camera
 }
 
+func (d *Demo) SetMouseSens(sens float32) {
+	d.mouse_sens = sens
+}
+
+func (d *Demo) SetZoomSpeed(speed float32) {
+	d.zoom_speed = speed
+}
+
 func Point2DToVector2(p u.Point2D) rl.Vector2 {
 	return rl.NewVector2(p.X, -p.Y)
 }
@@ -61,7 +71,8 @@ func GetDefaultZoom(points []u.Point2D) (rl.Vector2, float32) {
 	d := pMax.Subtract(pMin)
 	center := pMin.Add(pMax).Scale(0.5)
 	zoomX := float32(rl.GetScreenWidth()) / d.X * 0.90
-	zoomY := float32(rl.GetScreenWidth()) / d.Y * 0.90
+	zoomY := float32(rl.GetScreenHeight()) / d.Y * 0.90
+	log.Println("zoomXY", zoomX, zoomY)
 	zoom := min(zoomX, zoomY)
 	return Point2DToVector2(center), zoom
 }
