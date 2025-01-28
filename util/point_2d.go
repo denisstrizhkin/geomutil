@@ -133,3 +133,17 @@ func Point2DMax(points []Point2D) Point2D {
 	}
 	return pMax
 }
+
+type ByPoint2DX []Point2D
+
+func (p ByPoint2DX) Len() int {
+	return len(p)
+}
+
+func (p ByPoint2DX) Less(i, j int) bool {
+	return p[i].X < p[j].X
+}
+
+func (p ByPoint2DX) Swap(i, j int) {
+	p[i], p[j] = p[j], p[i]
+}

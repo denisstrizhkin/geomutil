@@ -63,6 +63,8 @@ func main() {
 	colors := make([]rl.Color, 0)
 	btn := rl.NewRectangle(float32(rl.GetScreenWidth())-60, float32(rl.GetScreenHeight())-30, 60, 30)
 	d.Run(func() {
+		d.UpdateCamera()
+
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.RayWhite)
 

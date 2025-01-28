@@ -15,7 +15,7 @@ type Demo struct {
 	mouse_sens float32
 }
 
-func (d *Demo) updateCamera() {
+func (d *Demo) UpdateCamera() {
 	dt := rl.GetFrameTime()
 	if rl.IsMouseButtonDown(rl.MouseButtonLeft) {
 		mousePosDelta := rl.GetMouseDelta()
@@ -40,7 +40,6 @@ func NewDemo(width, height int32, name string) *Demo {
 func (d *Demo) Run(callback func()) {
 	rl.SetTargetFPS(60)
 	for !rl.WindowShouldClose() {
-		d.updateCamera()
 		callback()
 	}
 }

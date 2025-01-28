@@ -1,37 +1,48 @@
 package geomutil
 
 import (
-	"fmt"
+	"log"
 	"sort"
+
+	util "github.com/denisstrizhkin/geomutil/util"
 )
 
-type ConvexHull struct {
-	Points []Point
-}
-
-func (p Point) CheckTurn(q Point) float64 {
+func checkTurn(p, q util.Point2D) float32 {
 	return p.X*q.Y - p.Y*q.X
 }
 
-func NewConvexHull(points []Point) *ConvexHull {
-	sort.Sort(ByPointX(points))
-	fmt.Println(points)
-	is_left_turn := func(a, b, c Point) bool {
-		fmt.Println(a.Subtract(b).CheckTurn(b.Subtract(c)))
-		return a.Subtract(b).CheckTurn(b.Subtract(c)) <= 0
-	}
-	L_up := []Point{points[0], points[1]}
+func isLeftTurn(a, b, c util.Point2D) bool {
+	ab := a.Subtract(b)
+	bc := b.Subtract(c)
+	check := checkTurn(ab, bc)
+	log.Println(check)
+	return check <= 0
+}
+
+type ConvexHull struct {
+	points []util.Point2D
+}
+
+func (ch *ConvexHull) Points() []util.Point2D {
+	return ch.points
+}
+
+func NewConvexHull(points []util.Point2D) *ConvexHull {
+	points = util.Point2DUnique(points)
+	sort.Sort(util.ByPoint2DX(points))
+	log.Println(points)
+	L_up := []util.Point2D{points[0], points[1]}
 	for i := 2; i < len(points); i++ {
 		L_up = append(L_up, points[i])
-		for len(L_up) > 2 && is_left_turn(L_up[len(L_up)-1], L_up[len(L_up)-2], L_up[len(L_up)-3]) {
+		for len(L_up) > 2 && isLeftTurn(L_up[len(L_up)-1], L_up[len(L_up)-2], L_up[len(L_up)-3]) {
 			L_up = append(L_up[:len(L_up)-2], L_up[len(L_up)-1])
 		}
-		fmt.Println(points)
+		log.Println(points)
 	}
-	L_low := []Point{points[len(points)-1], points[len(points)-2]}
+	L_low := []util.Point2D{points[len(points)-1], points[len(points)-2]}
 	for i := len(points) - 3; i >= 0; i-- {
 		L_low = append(L_low, points[i])
-		for len(L_low) > 2 && is_left_turn(L_low[len(L_low)-1], L_low[len(L_low)-2], L_low[len(L_low)-3]) {
+		for len(L_low) > 2 && isLeftTurn(L_low[len(L_low)-1], L_low[len(L_low)-2], L_low[len(L_low)-3]) {
 			L_low = append(L_low[:len(L_low)-2], L_low[len(L_low)-1])
 		}
 	}

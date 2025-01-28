@@ -14,16 +14,16 @@ import (
 // 	return
 // }
 
-type ByPointA []Edge
+// type ByPointA []Edge
 
-func (p ByPointA) Len() int {
-	return len(p)
-}
+// func (p ByPointA) Len() int {
+// 	return len(p)
+// }
 
-func (p ByPointA) Less(i, j int) bool {
-	return p[i].A.Y < p[j].A.Y
-}
+// func (p ByPointA) Less(i, j int) bool {
+// 	return p[i].A.Y < p[j].A.Y
+// }
 
-func (p ByPointA) Swap(i, j int) {
-	p[i], p[j] = p[j], p[i]
-}
+// func (p ByPointA) Swap(i, j int) {
+// 	p[i], p[j] = p[j], p[i]
+// }
