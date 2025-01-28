@@ -1,10 +1,8 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"math/rand"
-	"os"
 
 	demo "github.com/denisstrizhkin/geomutil/demo"
 	tri "github.com/denisstrizhkin/geomutil/triangulation"
@@ -44,19 +42,9 @@ func main() {
 	// 	util.NewPoint2D(0.0, 1.0),
 	// 	util.NewPoint2D(1.0, 1.0),
 	// }
-	file_path := "../points_A.json"
-	file, err := os.Open(file_path)
+	points, err := util.Point2DFromFile("../points_A.json")
 	if err != nil {
-		log.Fatalf("open %v: %v", file_path, err)
-	}
-	defer file.Close() // Ensure the file is closed after we're done
-
-	// Decode the JSON data
-	var points []util.Point2D
-	decoder := json.NewDecoder(file)
-	err = decoder.Decode(&points)
-	if err != nil {
-		log.Fatalf("decoding JSON: %v", err)
+		log.Fatalln(err)
 	}
 
 	d := demo.NewDemo(WINDOW_WIDTH, WINDOW_HEIGHT, "Triangulation 2D")

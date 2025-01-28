@@ -1,5 +1,11 @@
 package util
 
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+)
+
 type Point2D struct {
 	X float32 `json:"x"`
 	Y float32 `json:"y"`
@@ -7,6 +13,23 @@ type Point2D struct {
 
 func NewPoint2D(X float32, Y float32) Point2D {
 	return Point2D{X: X, Y: Y}
+}
+
+func Point2DFromFile(path string) ([]Point2D, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, fmt.Errorf("open %v: %v", path, err)
+	}
+	defer file.Close()
+
+	var points []Point2D
+	decoder := json.NewDecoder(file)
+	err = decoder.Decode(&points)
+	if err != nil {
+		return nil, fmt.Errorf("decoding JSON: %v", err)
+	}
+
+	return points, nil
 }
 
 func (p Point2D) Length() float32 {
