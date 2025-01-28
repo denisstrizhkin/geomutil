@@ -1,10 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
+	"math/rand"
+	"os"
 
 	demo "github.com/denisstrizhkin/geomutil/demo"
-	triangulation "github.com/denisstrizhkin/geomutil/triangulation"
+	tri "github.com/denisstrizhkin/geomutil/triangulation"
 	util "github.com/denisstrizhkin/geomutil/util"
 
 	rg "github.com/gen2brain/raylib-go/raygui"
@@ -18,27 +21,58 @@ const (
 	WINDOW_HEIGHT = 450
 )
 
-func main() {
-	points := []util.Point2D{
-		util.NewPoint2D(0.0, 0.0),
-		util.NewPoint2D(1.0, 0.0),
-		util.NewPoint2D(0.0, 1.0),
-		util.NewPoint2D(1.0, 1.0),
+func GetRandomColor() rl.Color {
+	var color rl.Color
+	for {
+		// Generate random RGB values
+		color.R = uint8(rand.Intn(256))
+		color.G = uint8(rand.Intn(256))
+		color.B = uint8(rand.Intn(256))
+		color.A = 255 // Fully opaque
+		if color.R < 240 && color.G < 240 && color.B < 240 {
+			break
+		}
 	}
-	triangulation, _ := triangulation.NewTriangulation2D(points)
+
+	return color
+}
+
+func main() {
+	// points := []util.Point2D{
+	// 	util.NewPoint2D(0.0, 0.0),
+	// 	util.NewPoint2D(1.0, 0.0),
+	// 	util.NewPoint2D(0.0, 1.0),
+	// 	util.NewPoint2D(1.0, 1.0),
+	// }
+	file_path := "../input.json"
+	file, err := os.Open(file_path)
+	if err != nil {
+		log.Fatalf("open %v: %v", file_path, err)
+	}
+	defer file.Close() // Ensure the file is closed after we're done
+
+	// Decode the JSON data
+	var points []util.Point2D
+	decoder := json.NewDecoder(file)
+	err = decoder.Decode(&points)
+	if err != nil {
+		log.Fatalf("decoding JSON: %v", err)
+	}
 
 	d := demo.NewDemo(WINDOW_WIDTH, WINDOW_HEIGHT, "Triangulation 2D")
 	defer d.Close()
 	d.SetMouseSens(MOUSE_SENS)
 	d.SetZoomSpeed(ZOOM_SPEED)
 
+	triangulation, _ := tri.NewTriangulation2D(points)
+
 	cameraTarget, cameraZoom := demo.GetDefaultZoom(points)
-	log.Println("target", cameraTarget)
-	log.Println("zoom", cameraZoom)
 	camera := d.Camera()
 	camera.Target = cameraTarget
-	camera.Zoom = cameraZoom
+	camera.Zoom = cameraZoom * 0.5
 
+	triangles := triangulation.Triangles()
+	colors := make([]rl.Color, 0)
 	btn := rl.NewRectangle(float32(rl.GetScreenWidth())-60, float32(rl.GetScreenHeight())-30, 60, 30)
 	d.Run(func() {
 		rl.BeginDrawing()
@@ -46,14 +80,25 @@ func main() {
 
 		rl.BeginMode2D(*camera)
 
-		triangles := triangulation.Triangles()
-		demo.PlotTriangles(triangles, 2, rl.Green)
+		for i, triangle := range triangles {
+			for {
+				if i < len(colors) {
+					break
+				}
+				colors = append(colors, GetRandomColor())
+			}
+			demo.DrawTriangle(triangle, colors[i])
+		}
 		demo.PlotPoints(points, 5, camera.Zoom, rl.Black)
 
 		rl.EndMode2D()
 
 		if rg.Button(btn, "Next") || rl.IsKeyPressed(rl.KeyN) {
+			log.Println("triangles count:", len(triangles))
+			log.Println("Next step")
 			triangulation.Step()
+			triangles = triangulation.Triangles()
+			log.Println("triangles count:", len(triangles))
 		}
 
 		rl.EndDrawing()

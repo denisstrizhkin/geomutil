@@ -2,6 +2,7 @@ package triangulation
 
 import (
 	"errors"
+	"log"
 	"slices"
 
 	u "github.com/denisstrizhkin/geomutil/util"
@@ -92,6 +93,9 @@ func (t *Triangulation2D) Triangles() []Triangle2D {
 }
 
 func (t *Triangulation2D) Step() {
+	if t.step >= len(t.points) {
+		return
+	}
 	point := t.points[t.step]
 
 	badTriangles := make([]Triangle2D, 0)
@@ -100,17 +104,20 @@ func (t *Triangulation2D) Step() {
 			badTriangles = append(badTriangles, triangle)
 		}
 	}
+	log.Printf("Bad triangles (%v): (%v)\n", len(badTriangles), badTriangles)
 	edges := make(map[u.Edge2D]int, len(badTriangles)*3)
 	for _, triangle := range badTriangles {
 		for _, edge := range triangle.edges() {
-			edges[edge] += 1
 			rotated := edge.Rotate()
-			if _, exists := edges[rotated]; exists {
+			if edges[rotated] != 0 {
 				edges[rotated] += 1
+			} else {
+				edges[edge] += 1
 			}
 		}
 	}
-	polygon := make([]u.Edge2D, len(badTriangles))
+	log.Println("edges:", edges)
+	polygon := make([]u.Edge2D, 0, len(badTriangles))
 	for edge, count := range edges {
 		if count == 1 {
 			polygon = append(polygon, edge)

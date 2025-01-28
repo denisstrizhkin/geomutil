@@ -1,7 +1,8 @@
 package util
 
 type Point2D struct {
-	X, Y float32
+	X float32 `json:"x"`
+	Y float32 `json:"y"`
 }
 
 func NewPoint2D(X float32, Y float32) Point2D {
@@ -76,7 +77,7 @@ func (p Point2D) Normalize() Point2D {
 
 func Point2DUnique(points []Point2D) []Point2D {
 	pMap := make(map[Point2D]bool, len(points))
-	unique := make([]Point2D, len(points))
+	unique := make([]Point2D, 0, len(points))
 	for _, point := range points {
 		if !pMap[point] {
 			unique = append(unique, point)

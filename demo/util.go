@@ -85,8 +85,8 @@ func PlotPoints(points []u.Point2D, radius float32, zoom float32, color rl.Color
 }
 
 func DrawLine(a u.Point2D, b u.Point2D, color rl.Color) {
-	a_new := rl.Vector2SubtractValue(Point2DToVector2(a), 0.5)
-	b_new := rl.Vector2SubtractValue(Point2DToVector2(b), 0.5)
+	a_new := Point2DToVector2(a)
+	b_new := Point2DToVector2(b)
 	rl.DrawLineV(a_new, b_new, color)
 }
 
@@ -102,8 +102,16 @@ func PlotPolygon(points []u.Point2D, width float32, color rl.Color) {
 	rl.SetLineWidth(prevWidth)
 }
 
+func PlotTriangle(triangle tri.Triangle2D, width float32, color rl.Color) {
+	PlotPolygon([]u.Point2D{triangle.A, triangle.B, triangle.C}, width, color)
+}
+
+func DrawTriangle(triangle tri.Triangle2D, color rl.Color) {
+	rl.DrawTriangle(Point2DToVector2(triangle.A), Point2DToVector2(triangle.B), Point2DToVector2(triangle.C), color)
+}
+
 func PlotTriangles(triangles []tri.Triangle2D, width float32, color rl.Color) {
 	for _, triangle := range triangles {
-		PlotPolygon([]u.Point2D{triangle.A, triangle.B, triangle.C}, width, color)
+		PlotTriangle(triangle, width, color)
 	}
 }
