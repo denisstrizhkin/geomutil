@@ -63,6 +63,7 @@ func getBoundingTriangle(points []u.Point2D) Triangle2D {
 type Triangulation2D struct {
 	points    []u.Point2D
 	triangles []Triangle2D
+	step      int
 }
 
 func NewTriangulation2D(points []u.Point2D) (Triangulation2D, error) {
@@ -71,18 +72,15 @@ func NewTriangulation2D(points []u.Point2D) (Triangulation2D, error) {
 		return Triangulation2D{}, errors.New("less than 3 unique points")
 	}
 
-	triangulation := Triangulation2D{points, make([]Triangle2D, 0)}
-	triangulation.triangulate()
+	triangulation := Triangulation2D{points, make([]Triangle2D, 0), 0}
+	triangulation.setup()
 
 	return triangulation, nil
 }
 
-func (t *Triangulation2D) triangulate() {
+func (t *Triangulation2D) setup() {
 	boundingTriangle := getBoundingTriangle(t.points)
 	t.triangles = append(t.triangles, boundingTriangle)
-	for _, point := range t.points {
-		t.Step(point)
-	}
 }
 
 func (t *Triangulation2D) Points() []u.Point2D {
@@ -93,7 +91,9 @@ func (t *Triangulation2D) Triangles() []Triangle2D {
 	return t.triangles
 }
 
-func (t *Triangulation2D) Step(point u.Point2D) {
+func (t *Triangulation2D) Step() {
+	point := t.points[t.step]
+
 	badTriangles := make([]Triangle2D, 0)
 	for _, triangle := range t.triangles {
 		if triangle.isInsideCircumcircle(point) {
@@ -124,4 +124,6 @@ func (t *Triangulation2D) Step(point u.Point2D) {
 	for _, edge := range polygon {
 		t.triangles = append(t.triangles, NewTriangle2D(edge.A, edge.B, point))
 	}
+
+	t.step += 1
 }

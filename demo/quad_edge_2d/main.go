@@ -18,65 +18,6 @@ const (
 	WINDOW_HEIGHT = 450
 )
 
-func point2DToVector2(p u.Point2D) rl.Vector2 {
-	return rl.NewVector2(p.X, -p.Y)
-}
-
-func getDefaultZoom(points []u.Point2D) (rl.Vector2, float32) {
-	pMax := u.Point2DMax(points)
-	pMin := u.Point2DMin(points)
-	d := pMax.Subtract(pMin)
-	center := pMin.Add(pMax).Scale(0.5)
-	zoomX := float32(WINDOW_WIDTH) / d.X * 0.90
-	zoomY := float32(WINDOW_HEIGHT) / d.Y * 0.90
-	zoom := min(zoomX, zoomY)
-	return point2DToVector2(center), zoom
-}
-
-func updateCamera(c *rl.Camera2D) {
-	dt := rl.GetFrameTime()
-	if rl.IsMouseButtonDown(rl.MouseButtonLeft) {
-		mousePosDelta := rl.GetMouseDelta()
-		mousePosDelta = rl.Vector2Scale(mousePosDelta, dt*MOUSE_SENS)
-		c.Offset = rl.Vector2Add(c.Offset, mousePosDelta)
-	}
-	c.Zoom += dt * ZOOM_SPEED * rl.GetMouseWheelMove()
-	if c.Zoom <= 0 {
-		c.Zoom = 0
-	}
-}
-
-func plotPoints(points []u.Point2D, radius float32, zoom float32, color rl.Color) {
-	radius = radius / zoom
-	for _, p := range points {
-		rl.DrawCircleV(point2DToVector2(p), radius, color)
-	}
-}
-
-func DrawLine(a u.Point2D, b u.Point2D, color rl.Color) {
-	a_new := rl.Vector2SubtractValue(point2DToVector2(a), 0.5)
-	b_new := rl.Vector2SubtractValue(point2DToVector2(b), 0.5)
-	rl.DrawLineV(a_new, b_new, color)
-}
-
-func plotPolygon(points []u.Point2D, width float32, color rl.Color) {
-	prevWidth := rl.GetLineWidth()
-	rl.DrawRenderBatchActive()
-	rl.SetLineWidth(width)
-	for i := 1; i < len(points); i++ {
-		DrawLine(points[i-1], points[i], color)
-	}
-	DrawLine(points[len(points)-1], points[0], color)
-	rl.DrawRenderBatchActive()
-	rl.SetLineWidth(prevWidth)
-}
-
-func plotTriangles(triangles []tri.Triangle2D, width float32, color rl.Color) {
-	for _, triangle := range triangles {
-		plotPolygon([]u.Point2D{triangle.A, triangle.B, triangle.C}, width, color)
-	}
-}
-
 func drawQuarterEdge(e *tri.QuarterEdge, width float32, zoom float32, color rl.Color) {
 	prevWidth := rl.GetLineWidth()
 	rl.DrawRenderBatchActive()
