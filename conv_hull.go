@@ -15,8 +15,44 @@ func isLeftTurn(a, b, c util.Point2D) bool {
 	ab := a.Subtract(b)
 	bc := b.Subtract(c)
 	check := checkTurn(ab, bc)
-	log.Println(check)
+	log.Print(check)
 	return check <= 0
+}
+
+func upperBoundary(points []util.Point2D) []util.Point2D {
+	upper := []util.Point2D{points[0], points[1]}
+	for i := 2; i < len(points); i++ {
+		upper = append(upper, points[i])
+		for len(upper) > 2 {
+			ai := len(upper) - 1
+			bi := len(upper) - 2
+			ci := len(upper) - 3
+			if !isLeftTurn(upper[ai], upper[bi], upper[ci]) {
+				break
+			}
+			upper = append(upper[:bi], upper[ai])
+		}
+		log.Print(points)
+	}
+	return upper
+}
+
+func lowerBoundary(points []util.Point2D) []util.Point2D {
+	lower := []util.Point2D{points[len(points)-1], points[len(points)-2]}
+	for i := len(points) - 3; i >= 0; i-- {
+		lower = append(lower, points[i])
+		for len(lower) > 2 {
+			ai := len(lower) - 1
+			bi := len(lower) - 2
+			ci := len(lower) - 3
+			if !isLeftTurn(lower[ai], lower[bi], lower[ci]) {
+				break
+			}
+			lower = append(lower[:bi], lower[ai])
+		}
+		log.Print(points)
+	}
+	return lower
 }
 
 type ConvexHull struct {
@@ -30,21 +66,8 @@ func (ch *ConvexHull) Points() []util.Point2D {
 func NewConvexHull(points []util.Point2D) *ConvexHull {
 	points = util.Point2DUnique(points)
 	sort.Sort(util.ByPoint2DX(points))
-	log.Println(points)
-	L_up := []util.Point2D{points[0], points[1]}
-	for i := 2; i < len(points); i++ {
-		L_up = append(L_up, points[i])
-		for len(L_up) > 2 && isLeftTurn(L_up[len(L_up)-1], L_up[len(L_up)-2], L_up[len(L_up)-3]) {
-			L_up = append(L_up[:len(L_up)-2], L_up[len(L_up)-1])
-		}
-		log.Println(points)
-	}
-	L_low := []util.Point2D{points[len(points)-1], points[len(points)-2]}
-	for i := len(points) - 3; i >= 0; i-- {
-		L_low = append(L_low, points[i])
-		for len(L_low) > 2 && isLeftTurn(L_low[len(L_low)-1], L_low[len(L_low)-2], L_low[len(L_low)-3]) {
-			L_low = append(L_low[:len(L_low)-2], L_low[len(L_low)-1])
-		}
-	}
-	return &ConvexHull{append(L_up, L_low[1:len(L_low)-1]...)}
+	log.Print(points)
+	upper := upperBoundary(points)
+	lower := lowerBoundary(points)
+	return &ConvexHull{append(upper, lower[1:len(lower)-1]...)}
 }

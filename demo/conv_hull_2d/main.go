@@ -27,6 +27,8 @@ func main() {
 	gh := geomutil.NewConvexHull(points)
 
 	d := demo.NewDemo(WINDOW_WIDTH, WINDOW_HEIGHT, "Convex hull 2D")
+	d.SetMouseSens(MOUSE_SENS)
+	d.SetZoomSpeed(ZOOM_SPEED)
 	defer d.Close()
 
 	cameraTarget, cameraZoom := demo.GetDefaultZoom(points)
@@ -38,6 +40,18 @@ func main() {
 	mode_text := ""
 
 	d.Run(func() {
+		if rl.IsKeyPressed(rl.KeySpace) {
+			log.Print("switching modes")
+			switch mode {
+			case MODE_MOVE:
+				mode = MODE_ADD
+			case MODE_ADD:
+				mode = MODE_MOVE
+			default:
+				log.Fatal("Unknown mode:", mode)
+			}
+		}
+
 		switch mode {
 		case MODE_MOVE:
 			mode_text = "MOVE"
@@ -57,7 +71,6 @@ func main() {
 		default:
 			log.Fatal("Unknown mode:", mode)
 		}
-		log.Println("ok")
 
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.RayWhite)
