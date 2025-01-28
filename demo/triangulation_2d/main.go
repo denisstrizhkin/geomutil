@@ -44,7 +44,7 @@ func main() {
 	// 	util.NewPoint2D(0.0, 1.0),
 	// 	util.NewPoint2D(1.0, 1.0),
 	// }
-	file_path := "../input.json"
+	file_path := "../points_A.json"
 	file, err := os.Open(file_path)
 	if err != nil {
 		log.Fatalf("open %v: %v", file_path, err)
