@@ -8,15 +8,15 @@ import (
 	tri "github.com/denisstrizhkin/geomutil/triangulation"
 	util "github.com/denisstrizhkin/geomutil/util"
 
-	rg "github.com/gen2brain/raylib-go/raygui"
+	// rg "github.com/gen2brain/raylib-go/raygui"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 const (
 	ZOOM_SPEED    = 100
 	MOUSE_SENS    = 100
-	WINDOW_WIDTH  = 800
-	WINDOW_HEIGHT = 450
+	WINDOW_WIDTH  = 1600
+	WINDOW_HEIGHT = 900
 )
 
 func GetRandomColor() rl.Color {
@@ -61,7 +61,7 @@ func main() {
 
 	triangles := triangulation.Triangles()
 	colors := make([]rl.Color, 0)
-	btn := rl.NewRectangle(float32(rl.GetScreenWidth())-60, float32(rl.GetScreenHeight())-30, 60, 30)
+	// btn := rl.NewRectangle(float32(rl.GetScreenWidth())-60, float32(rl.GetScreenHeight())-30, 60, 30)
 	d.Run(func() {
 		d.UpdateCamera()
 
@@ -83,13 +83,13 @@ func main() {
 
 		rl.EndMode2D()
 
-		if rg.Button(btn, "Next") || rl.IsKeyPressed(rl.KeyN) {
-			log.Println("triangles count:", len(triangles))
-			log.Println("Next step")
-			triangulation.Step()
-			triangles = triangulation.Triangles()
-			log.Println("triangles count:", len(triangles))
-		}
+		// if rg.Button(btn, "Next") || rl.IsKeyPressed(rl.KeyN) {
+		// 	log.Println("triangles count:", len(triangles))
+		// 	log.Println("Next step")
+		// 	triangulation.Step()
+		// 	triangles = triangulation.Triangles()
+		// 	log.Println("triangles count:", len(triangles))
+		// }
 
 		rl.EndDrawing()
 	})

@@ -6,7 +6,6 @@ import (
 	"github.com/denisstrizhkin/geomutil/util"
 	u "github.com/denisstrizhkin/geomutil/util"
 
-	tri "github.com/denisstrizhkin/geomutil/triangulation"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -113,15 +112,15 @@ func PlotPolygon(points []u.Point2D, width float32, color rl.Color) {
 	rl.SetLineWidth(prevWidth)
 }
 
-func PlotTriangle(triangle tri.Triangle2D, width float32, color rl.Color) {
+func PlotTriangle(triangle u.Triangle2D, width float32, color rl.Color) {
 	PlotPolygon([]u.Point2D{triangle.A, triangle.B, triangle.C}, width, color)
 }
 
-func DrawTriangle(triangle tri.Triangle2D, color rl.Color) {
+func DrawTriangle(triangle u.Triangle2D, color rl.Color) {
 	rl.DrawTriangle(Point2DToVector2(triangle.A), Point2DToVector2(triangle.B), Point2DToVector2(triangle.C), color)
 }
 
-func PlotTriangles(triangles []tri.Triangle2D, width float32, color rl.Color) {
+func PlotTriangles(triangles []u.Triangle2D, width float32, color rl.Color) {
 	for _, triangle := range triangles {
 		PlotTriangle(triangle, width, color)
 	}
