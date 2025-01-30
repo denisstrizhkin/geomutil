@@ -3,6 +3,7 @@ package demo
 import (
 	"log"
 
+	"github.com/denisstrizhkin/geomutil/util"
 	u "github.com/denisstrizhkin/geomutil/util"
 
 	tri "github.com/denisstrizhkin/geomutil/triangulation"
@@ -60,8 +61,19 @@ func (d *Demo) SetZoomSpeed(speed float32) {
 	d.zoom_speed = speed
 }
 
+func (d *Demo) MousePositionPoint2D() u.Point2D {
+	pos := rl.Vector2Subtract(rl.GetMousePosition(), d.camera.Offset)
+	pos = rl.Vector2Scale(pos, 1/d.camera.Zoom)
+	pos = rl.Vector2Add(pos, d.camera.Target)
+	return Vector2ToPoint2D(pos)
+}
+
 func Point2DToVector2(p u.Point2D) rl.Vector2 {
 	return rl.NewVector2(p.X, -p.Y)
+}
+
+func Vector2ToPoint2D(p rl.Vector2) util.Point2D {
+	return util.NewPoint2D(p.X, -p.Y)
 }
 
 func GetDefaultZoom(points []u.Point2D) (rl.Vector2, float32) {

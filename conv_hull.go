@@ -1,7 +1,6 @@
 package geomutil
 
 import (
-	"log"
 	"sort"
 
 	util "github.com/denisstrizhkin/geomutil/util"
@@ -15,7 +14,6 @@ func isLeftTurn(a, b, c util.Point2D) bool {
 	ab := a.Subtract(b)
 	bc := b.Subtract(c)
 	check := checkTurn(ab, bc)
-	log.Print(check)
 	return check <= 0
 }
 
@@ -32,7 +30,6 @@ func upperBoundary(points []util.Point2D) []util.Point2D {
 			}
 			upper = append(upper[:bi], upper[ai])
 		}
-		log.Print(points)
 	}
 	return upper
 }
@@ -50,7 +47,6 @@ func lowerBoundary(points []util.Point2D) []util.Point2D {
 			}
 			lower = append(lower[:bi], lower[ai])
 		}
-		log.Print(points)
 	}
 	return lower
 }
@@ -66,7 +62,6 @@ func (ch *ConvexHull) Points() []util.Point2D {
 func NewConvexHull(points []util.Point2D) *ConvexHull {
 	points = util.Point2DUnique(points)
 	sort.Sort(util.ByPoint2DX(points))
-	log.Print(points)
 	upper := upperBoundary(points)
 	lower := lowerBoundary(points)
 	return &ConvexHull{append(upper, lower[1:len(lower)-1]...)}

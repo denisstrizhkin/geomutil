@@ -18,7 +18,7 @@ func NewPoint2D(X float32, Y float32) Point2D {
 func Point2DFromFile(path string) ([]Point2D, error) {
 	file, err := os.Open(path)
 	if err != nil {
-		return nil, fmt.Errorf("open %v: %v", path, err)
+		return nil, err
 	}
 	defer file.Close()
 

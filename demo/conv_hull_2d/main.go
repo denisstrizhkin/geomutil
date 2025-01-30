@@ -13,14 +13,14 @@ const (
 	ZOOM_SPEED    = 100
 	MOUSE_SENS    = 100
 	WINDOW_WIDTH  = 800
-	WINDOW_HEIGHT = 450
+	WINDOW_HEIGHT = 600
 
 	MODE_MOVE = 0
 	MODE_ADD  = 1
 )
 
 func main() {
-	points, err := util.Point2DFromFile("../input.json")
+	points, err := util.Point2DFromFile("../points.json")
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -59,10 +59,7 @@ func main() {
 		case MODE_ADD:
 			mode_text = "ADD"
 			if rl.IsMouseButtonDown(rl.MouseButtonLeft) {
-				pos := rl.GetMousePosition()
-				log.Print(pos)
-				pos = rl.Vector2Scale(pos, 1/camera.Zoom)
-				log.Print(pos)
+				pos := d.MousePositionPoint2D()
 				points = append(
 					points, util.NewPoint2D(pos.X, pos.Y),
 				)
