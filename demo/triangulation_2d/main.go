@@ -17,9 +17,13 @@ const (
 	MOUSE_SENS    = 100
 	WINDOW_WIDTH  = 1600
 	WINDOW_HEIGHT = 900
+
+	MODE_MOVE = 0
+	MODE_ADD  = 1
 )
 
 func GetRandomColor() rl.Color {
+	const threshold = 250
 	var color rl.Color
 	for {
 		// Generate random RGB values
@@ -27,12 +31,20 @@ func GetRandomColor() rl.Color {
 		color.G = uint8(rand.Intn(256))
 		color.B = uint8(rand.Intn(256))
 		color.A = 255 // Fully opaque
-		if color.R < 240 && color.G < 240 && color.B < 240 {
+		if color.R < threshold && color.G < threshold && color.B < threshold {
 			break
 		}
 	}
 
 	return color
+}
+
+func GetColors(n int) []rl.Color {
+	colors := make([]rl.Color, n)
+	for i := range colors {
+		colors[i] = GetRandomColor()
+	}
+	return colors
 }
 
 func main() {
@@ -60,10 +72,42 @@ func main() {
 	camera.Zoom = cameraZoom * 0.5
 
 	triangles := triangulation.Triangles()
-	colors := make([]rl.Color, 0)
-	// btn := rl.NewRectangle(float32(rl.GetScreenWidth())-60, float32(rl.GetScreenHeight())-30, 60, 30)
+	colors := GetColors(len(triangles))
+
+	mode := uint8(MODE_MOVE)
+	mode_text := ""
+
 	d.Run(func() {
-		d.UpdateCamera()
+		if rl.IsKeyPressed(rl.KeySpace) {
+			log.Print("switching modes")
+			switch mode {
+			case MODE_MOVE:
+				mode = MODE_ADD
+			case MODE_ADD:
+				mode = MODE_MOVE
+			default:
+				log.Fatal("Unknown mode:", mode)
+			}
+		}
+
+		switch mode {
+		case MODE_MOVE:
+			mode_text = "MOVE"
+			d.UpdateCamera()
+		case MODE_ADD:
+			mode_text = "ADD"
+			if rl.IsMouseButtonDown(rl.MouseButtonLeft) {
+				pos := d.MousePositionPoint2D()
+				points = append(
+					points, util.NewPoint2D(pos.X, pos.Y),
+				)
+				triangulation, _ = tri.NewTriangulation2D(points)
+				triangles = triangulation.Triangles()
+				colors = GetColors(len(triangles))
+			}
+		default:
+			log.Fatal("Unknown mode:", mode)
+		}
 
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.RayWhite)
@@ -71,12 +115,6 @@ func main() {
 		rl.BeginMode2D(*camera)
 
 		for i, triangle := range triangles {
-			for {
-				if i < len(colors) {
-					break
-				}
-				colors = append(colors, GetRandomColor())
-			}
 			demo.DrawTriangle(triangle, colors[i])
 		}
 		demo.PlotPoints(points, 5, camera.Zoom, rl.Black)
@@ -90,6 +128,8 @@ func main() {
 		// 	triangles = triangulation.Triangles()
 		// 	log.Println("triangles count:", len(triangles))
 		// }
+
+		rl.DrawText(mode_text, 5, 5, 20, rl.Black)
 
 		rl.EndDrawing()
 	})
