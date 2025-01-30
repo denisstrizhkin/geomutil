@@ -65,7 +65,7 @@ func (p Point2D) SubtractValue(a float32) Point2D {
 }
 
 func (p Point2D) Multiply(q Point2D) Point2D {
-	return NewPoint2D(p.X*q.Y, p.X*q.Y)
+	return NewPoint2D(p.X*q.X, p.X*q.X)
 }
 
 func (p Point2D) Distance(q Point2D) float32 {
