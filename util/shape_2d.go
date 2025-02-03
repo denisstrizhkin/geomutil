@@ -8,6 +8,10 @@ func NewShape2D(triangles []Triangle2D) Shape2D {
 	return Shape2D{triangles}
 }
 
+func (s *Shape2D) Triangles() []Triangle2D {
+	return s.triangles
+}
+
 func (s *Shape2D) Volume() float32 {
 	vol := float32(0)
 	for _, tri := range s.triangles {

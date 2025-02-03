@@ -82,9 +82,9 @@ func main() {
 
 	var value float32 = 0.0
 	value_old := value
-	shape, _ := tri.NewAlphaShape2D(points, value)
-	triangles := shape.Triangles()
-	colors := GetColors(len(triangles))
+	alpha_shape, _ := tri.NewAlphaShape2D(points, value)
+	shapes := alpha_shape.Shapes()
+	colors := GetColors(len(shapes))
 
 	move_camera := true
 	slider_boundaries := rl.NewRectangle(800, 50, 200, 50)
@@ -105,8 +105,10 @@ func main() {
 
 		rl.BeginMode2D(*camera)
 
-		for i, triangle := range triangles {
-			demo.DrawTriangle(triangle, colors[i])
+		for i, shape := range shapes {
+			for _, tri := range shape.Triangles() {
+				demo.DrawTriangle(tri, colors[i])
+			}
 		}
 		demo.PlotPoints(points, 5, camera.Zoom, rl.Black)
 
@@ -115,9 +117,9 @@ func main() {
 		value = rg.Slider(slider_boundaries, "alpha", fmt.Sprintf("%.3f", value), value, 0, 0.2)
 		if value != value_old {
 			value_old = value
-			shape, _ = tri.NewAlphaShape2D(points, value)
-			triangles = shape.Triangles()
-			colors = GetColors(len(triangles))
+			alpha_shape, _ = tri.NewAlphaShape2D(points, value)
+			shapes = alpha_shape.Shapes()
+			colors = GetColors(len(shapes))
 		}
 
 		rl.EndDrawing()
