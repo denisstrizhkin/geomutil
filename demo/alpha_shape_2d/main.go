@@ -75,8 +75,6 @@ func main() {
 	d.SetMouseSens(MOUSE_SENS)
 	d.SetZoomSpeed(ZOOM_SPEED)
 
-	// shape, _ := tri.NewTriangulation2D(points)
-
 	cameraTarget, cameraZoom := demo.GetDefaultZoom(points)
 	camera := d.Camera()
 	camera.Target = cameraTarget

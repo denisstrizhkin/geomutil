@@ -46,3 +46,12 @@ func (t *Triangle2D) Edges() [3]Edge2D {
 		NewEdge2D(t.C, t.A),
 	}
 }
+
+func (t *Triangle2D) Volume() float32 {
+	edges := t.Edges()
+	a := edges[0].Length()
+	b := edges[1].Length()
+	c := edges[2].Length()
+	s := 0.5 * (a + b + c)
+	return Sqrt(s * (s - a) * (s - b) * (s - c))
+}

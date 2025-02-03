@@ -12,3 +12,7 @@ func NewEdge2D(a Point2D, b Point2D) Edge2D {
 func (e *Edge2D) Rotate() Edge2D {
 	return NewEdge2D(e.B, e.A)
 }
+
+func (e *Edge2D) Length() float32 {
+	return e.A.Distance(e.B)
+}
