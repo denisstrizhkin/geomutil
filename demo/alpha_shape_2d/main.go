@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
 
@@ -8,7 +9,7 @@ import (
 	tri "github.com/denisstrizhkin/geomutil/triangulation"
 	util "github.com/denisstrizhkin/geomutil/util"
 
-	// rg "github.com/gen2brain/raylib-go/raygui"
+	rg "github.com/gen2brain/raylib-go/raygui"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -48,6 +49,12 @@ func GetColors(n int) []rl.Color {
 }
 
 func main() {
+	// Slider control extended, returns selected value and has text
+	// int GuiSlider(Rectangle bounds, const char *textLeft, const char *textRight, float *value, float minValue, float maxValue)
+	// {
+	//     return GuiSliderPro(bounds, textLeft, textRight, value, minValue, maxValue, GuiGetStyle(SLIDER, SLIDER_WIDTH));
+	// }
+
 	// points := []util.Point2D{
 	// 	util.NewPoint2D(0.0, 0.0),
 	// 	util.NewPoint2D(0.0, 1.0),
@@ -69,18 +76,31 @@ func main() {
 	d.SetZoomSpeed(ZOOM_SPEED)
 
 	// shape, _ := tri.NewTriangulation2D(points)
-	shape, _ := tri.NewAlphaShape2D(points, 0.13)
 
 	cameraTarget, cameraZoom := demo.GetDefaultZoom(points)
 	camera := d.Camera()
 	camera.Target = cameraTarget
 	camera.Zoom = cameraZoom * 0.5
 
+	var value float32 = 0.0
+	value_old := value
+	shape, _ := tri.NewAlphaShape2D(points, value)
 	triangles := shape.Triangles()
 	colors := GetColors(len(triangles))
 
+	move_camera := true
+	slider_boundaries := rl.NewRectangle(800, 50, 200, 50)
+
 	d.Run(func() {
-		d.UpdateCamera()
+		mouse_pos := rl.GetMousePosition()
+		if rl.CheckCollisionPointRec(mouse_pos, slider_boundaries) && rl.IsMouseButtonDown(rl.MouseButtonLeft) {
+			move_camera = false
+		} else if !move_camera && rl.IsMouseButtonReleased(rl.MouseButtonLeft) {
+			move_camera = true
+		}
+		if move_camera {
+			d.UpdateCamera()
+		}
 
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.RayWhite)
@@ -93,6 +113,14 @@ func main() {
 		demo.PlotPoints(points, 5, camera.Zoom, rl.Black)
 
 		rl.EndMode2D()
+
+		value = rg.Slider(slider_boundaries, "alpha", fmt.Sprintf("%.3f", value), value, 0, 0.2)
+		if value != value_old {
+			value_old = value
+			shape, _ = tri.NewAlphaShape2D(points, value)
+			triangles = shape.Triangles()
+			colors = GetColors(len(triangles))
+		}
 
 		rl.EndDrawing()
 	})
